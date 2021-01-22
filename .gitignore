@@ -20,7 +20,34 @@ bin-release/
 # dependencies
 /admin/node_modules
 /service/node_modules
+node_modules/
+service/package-lock.json
+service/public/img/profile-pic/*
+service/!public/img/profile-pic/empty
+service/public/img/vendor/*
+service/!public/img/vendor/empty
+service/public/img/category/*
+service/!public/img/category/empty
+service/public/img/vendor_category/*
+service/!public/img/vendor_category/empty
+service/public/img/offer/*
+service/!public/img/offer/empty
+service/public/img/deliveryboy/*
+service/!public/img/deliveryboy/empty
 
+admin/package-lock.json
+admin/public/img/profile-pic/*
+admin/!public/img/profile-pic/empty
+admin/public/img/vendor/*
+admin/!public/img/vendor/empty
+admin/public/img/category/*
+admin/!public/img/category/empty
+admin/public/img/vendor_category/*
+admin/!public/img/vendor_category/empty
+admin/public/img/offer/*
+admin/!public/img/offer/empty
+admin/public/img/deliveryboy/*
+admin/!public/img/deliveryboy/empty
 
 .vscode
 
