@@ -1,0 +1,106 @@
+<% layout('layout/beforelogin') -%>
+
+<body class="hold-transition login-page">
+  <div class="login-box">
+    <div class="login-logo">
+      <a href="javascript:void(0)"><b>Kabou </b> </a>
+    </div>
+    <!-- /.login-logo -->
+    <div class="card">
+      <div class="card-body login-card-body">
+        <p class="login-box-msg">Sign in to start your session</p>
+
+        <form id="login_form" method="post" action="/user/loginSubmit">
+          <div class="input-group mb-3">
+            <input type="text" id="email" name="email" class="form-control" placeholder="Email">
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-user"></span>
+              </div>
+            </div>
+          </div>
+          <div class="input-group mb-3">
+            <input type="password" id="password" name="password" class="form-control" placeholder="Password">
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-lock"></span>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <!-- /.col -->
+            <div class="col-4">
+              <button type="submit" class="btn btn-primary btn-block" id="signin">Sign In</button>
+            </div>
+            <!-- /.col -->
+
+          </div>
+          <p class="mb-1">
+            <a href="/user/forgotPassword">I forgot my password</a>
+          </p>
+        </form>
+      </div>
+      <!-- /.login-card-body -->
+    </div>
+  </div>
+  <!-- /.login-box -->
+
+  <!-- jQuery -->
+  <script src="../../plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../js/bootstrap-notify.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="../../js/adminlte.min.js"></script>
+
+  <script>
+    $(document).ready(function () {
+
+
+      // $('#signin').on('click', function (e) {
+      $('body').on('click', '#signin', function (e) {
+        // $("#signin").click(function(e){  
+        e.preventDefault();
+
+        var email = $('#email').val();
+        var password = $('#password').val();
+
+        if (email.trim() == '') {
+          $('#password').removeClass('is-invalid');
+          $('#email').addClass('is-invalid');
+        } else if (/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/.test(email) == false) {
+          $('#email').addClass('is-invalid');
+          $('#password').removeClass('is-invalid');
+        } else if (password.trim() == '') {
+          $('#email').removeClass('is-invalid');
+          $('#password').addClass('is-invalid');
+        } else {
+          $('#email').removeClass('is-invalid');
+          $('#password').removeClass('is-invalid');
+
+          $("#login_form").submit();
+
+        }
+      })
+    });
+
+  </script>
+  <% if(messages.msgLog){ %>
+    <script>
+      $(function () {
+        $.notify({
+          // options
+          message: '<%= messages.msgLog %>'
+        }, {
+          // settings
+          type: '<%= messages.msgType %>',
+          spacing: 10,
+          animate: {
+            enter: 'animated fadeInDown',
+            exit: 'animated fadeOutUp'
+          }
+        });
+      });
+    </script>
+    <% } %>
+</body>

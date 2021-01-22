@@ -1,0 +1,45 @@
+var mongoose = require('mongoose');
+
+var orderSchema = new mongoose.Schema({
+    vendorId: { type: mongoose.Schema.Types.ObjectId, required: true},
+    orderNo: {type: String, required: true, unique: true},
+    orderTime: {type: Date, required: true, default: new Date()},
+    orderDetails: [{ type: mongoose.Schema.Types.ObjectId, ref: 'OrderDetail' }],
+    estimatedDeliveryTime: {type: String },
+    foodReadyTime: {type: String, default: '1'},
+    deliveryTime: {type: String, default: '0'},
+    actualDeliveryTime: {type: Date},
+    deliveryHouseNo: { type: String},
+    deliveryCountryCode: { type: String},
+    deliveryPhone: { type: String},
+    deliveryLandmark: { type: String}, 
+    deliveryFullAddress: { type: String, default: ''},
+    deliveryAddressType: { type: String, default: ''},
+    deliveryLat: { type: String, default: ''},
+    deliveryLong: { type: String, default: ''},
+    customerId: { type: String },
+    userType: { type: String, required: true, enum: ['CUSTOMER','GUEST'],default: 'CUSTOMER' },
+    guestName: { type: String, default: 'Guest'},
+    guestEmail: { type: String, default: ''},
+    guestCountryCode: { type: String, default: ''},
+    guestPhone: { type: String, default: ''},
+    orderType: { type: String, required: true, enum: ['NORMAL','SCHEDULE'],default: 'NORMAL' },
+    deliveryPreference : { type: String, required: true, enum: ['DELIVERY','PICKUP'],default: 'DELIVERY' },
+    orderStatus: { type: String, required: true, enum: ['NEW','ACCEPTED', 'DELAYED', 'COLLECTED', 'COMPLETED','MODIFIED','CANCELLED','READY'],default: 'NEW'  },
+    paymentType: { type: String, required: true, enum: ['CARD','COD', 'BANK_TRANSFER', 'USSD']},
+    orderStatusChangeTime: {type:Date, default: new Date()},
+    orderAcceptedTime: {type:Date, default: new Date()},
+    orderCancelReason: { type: String, default: ''},
+    delayedTime: {type: Number, default: 0},
+    price: {type: Number, required: true },
+    discount: {type: Number},
+    finalPrice: {type: Number, required: true},
+    specialInstruction: {type: String,default: ''},
+    promocodeId: { type: String, default: ''},
+    promocode: { type: String, default: ''},
+    paymentStatus: { type: String, required: true, enum: ['NONE','CUSTOMER_PAID','COMPLETE'],default: 'NONE'},
+}, {
+    timestamps: true
+});
+
+module.exports = mongoose.model('Order', orderSchema);

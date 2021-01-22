@@ -1,0 +1,3 @@
+
+config/bootstrap.js merge=ours
+config/connection.js merge=ours

@@ -1,0 +1,349 @@
+<% layout('layout/afterlogin') -%>
+<style>
+  #customerList span {
+    display: none;
+  }
+
+  #customerList_filter {
+    display: none;
+  }
+</style>
+<!-- daterange picker -->
+<link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
+
+<body class="hold-transition sidebar-mini ">
+  <div class="wrapper">
+
+    <!-- Navbar -->
+    <% include ../layout/navbar %>
+
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <% include ../layout/sidebar %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>Customer <% if(customerCondtxt!= '') {%><small><%= customerCondtxt%></small><% } %></h1>
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="row">
+          <div class="col-12">
+            <!-- /.card -->
+
+            <div class="card">
+              <!-- /.card-header -->
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label>Filter</label>
+                      <select class="form-control select2" id="chngRes" onchange="javascript:filterCustomer();">
+                        <%
+                      var allSel = '';
+                      var activeSel = '';
+                      var inactiveSel = '';
+                      var durationSel = '';
+                      if(customerCondtxt == 'all') {
+                        allSel = 'selected'
+                      } 
+                      if(customerCondtxt == 'active') {
+                        activeSel = 'selected'
+                      }
+                      if(customerCondtxt == 'inactive') {
+                        inactiveSel = 'selected'
+                      }
+                      if(customerCondtxt == 'duration') {
+                        durationSel = 'selected'
+                      }%>
+
+                        <option value="all" <%= allSel%>>All</option>
+                        <option value="active" <%= activeSel%>>Active</option>
+                        <option value="inactive" <%= inactiveSel%>>Inactive</option>
+
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-2 ex-btn" style="margin-top: 33px;">
+
+                  </div>
+                  <div class="col-md-4 db-search">
+                    <div class="form-group">
+                      <label>Search</label>
+                      <input type="text" name="search" class="form-control myInputTextField" placeholder="Search">
+                    </div>
+
+                  </div>
+                  <div class="col-md-2" style="margin-top: 33px;">
+                    <% if(customerCondtxt!= '') {%> <button type="button" class="btn btn-block btn-info"
+                      onclick="window.location.href = '/customer/customerList'">Show All</button><% } %>
+                  </div>
+                </div>
+                <table id="customerList" class="table table-bordered table-striped" style="width:100%">
+                  <thead>
+                    <tr>
+                      <th>Name & Email</th>
+                      <th>Address</th>
+                      <th class="no-sort">Phone</th>
+                      <th class="no-sort">Status</th>
+                      <th>Created On</th>
+                      <th>Last Updated On</th>
+                      <th class="no-sort">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (customers.length > 0){%>
+                    <%  for (let customer of customers){ %>
+                    <tr>
+                      <td><%= customer.firstName %> <%= customer.lastName %> <br><sup>(<%= customer.email %>)</sup></td>
+                      <td><%= customer.location %></td>
+                      <td><%= customer.countryCode %><%= customer.phone %></td>
+                      <td class="customerStatus"><% if (customer.isActive == true){%>
+                        <button type="button" class="btn btn-block btn-success"
+                          onClick="javascript:changeCustomerStatus('<%= customer._id %>','Active');">Active</button>
+                        <% }else { %>
+                        <button type="button" class="btn btn-block btn-danger"
+                          onClick="javascript:changeCustomerStatus('<%= customer._id %>','Inactive');">Inactive</button>
+                        <% } %>
+                      </td>
+
+                      <td>
+                        <span><%= moment(customer.createdAt).format('YYYYMMDDhhmmss'); %></span><%= moment(customer.createdAt).format('DD/MM/YYYY h:mm:ss a'); %>
+                      </td>
+                      <td>
+                        <span><%= moment(customer.updatedAt).format('YYYYMMDDhhmmss'); %></span><%= moment(customer.updatedAt).format('DD/MM/YYYY h:mm:ss a'); %>
+                      </td>
+
+                      <td>
+
+
+                        <a href="/customer/customerEdit?id=<%= customer._id %>"><i style="color: green;cursor: pointer;"
+                            class="fa fa-edit" title="Edit Customer" aria-hidden="true"></i></a>
+
+                        | <i style="color: red;cursor: pointer;" class="fa fa-trash" title="Delete Customer"
+                          aria-hidden="true" onClick="javascript:deleteCustomer('<%= customer._id %>');"></i>
+
+                        <a href="/order/orderList?customer=<%= customer._id %>"><i style="color: black;cursor: pointer;"
+                            class="fab fa-opera" title="Customer order" aria-hidden="true"></i></a>
+
+                        | <a href="/payment/paymentList?customer=<%= customer._id %>"><i
+                            style="color: black;cursor: pointer;" class="far fa-money-bill-alt" title="Customer payment"
+                            aria-hidden="true"></i></a>
+
+                        <a href="/review/reviewList?customer=<%= customer._id %>">
+                          <i style="color: black;cursor: pointer;" class="fas fa-registered" title="Review List"
+                            aria-hidden="true"></i> </a>
+
+                        | <i style="color: blue;cursor: pointer;" class="fas fa-history" title="Log history"
+                          aria-hidden="true" onClick="javascript:getLogHistory('<%= customer._id %>');"></i>
+                      </td>
+                    </tr>
+                    <% } %>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <% include ../layout/footer %>
+
+  </div>
+
+  <div class="modal fade" id="modal-xl">
+    <div class="modal-dialog  modal-xl">
+
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Customer Log History</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body log-content"></div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+        </div>
+
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+
+  <!-- ./wrapper -->
+
+
+  <!-- jQuery -->
+  <script src="../../plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../js/bootstrap-notify.min.js"></script>
+  <!-- DataTables -->
+
+  <!-- <script src="../../plugins/datatables/jquery.dataTables.js"></script>
+  <script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
+  <script src="https://cdn.datatables.net/buttons/1.2.4/js/dataTables.buttons.min.js"></script> -->
+  <script type="text/javascript" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="//cdn.datatables.net/1.10.15/js/dataTables.bootstrap4.min.js"></script>
+  <script type="text/javascript" src="//cdn.datatables.net/buttons/1.3.1/js/dataTables.buttons.min.js"></script>
+  <script type="text/javascript" src="//cdn.datatables.net/buttons/1.3.1/js/buttons.bootstrap4.min.js"></script>
+
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+  <script type="text/javascript" src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.27/build/pdfmake.min.js"></script>
+  <script type="text/javascript" src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.27/build/vfs_fonts.js"></script>
+  <!-- <script type="text/javascript" src="//cdn.datatables.net/buttons/1.3.1/js/buttons.html5.min.js"></script> -->
+
+  <script src="../../js/buttons.html5.js"></script>
+  <!-- jquery-validation -->
+  <script src="../../plugins/jquery-validation/jquery.validate.min.js"></script>
+  <script src="../../plugins/jquery-validation/additional-methods.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="../../js/adminlte.min.js"></script>
+  <!-- Toastr -->
+  <script src="../../plugins/toastr/toastr.min.js"></script>
+  <script src="https://momentjs.com/downloads/moment.min.js"></script>
+
+  <script type="text/javascript">
+
+
+    $(function () {
+
+      var table = $('#customerList').removeAttr('width').DataTable({
+        fixedHeader: true,
+        scrollY: "600px",
+        scrollX: true,
+        scrollCollapse: false,
+        paging: false,
+        ordering: true,
+        columnDefs: [{
+          orderable: false,
+          targets: "no-sort"
+        }],
+        "order": [[4, "desc"]],
+        fixedColumns: true,
+        lengthChange: false,
+
+        dom: 'Bfrtip',
+        buttons: [
+          {
+            extend: 'excelHtml5',
+            text: 'Export to Excel',
+            title: `Customer-${moment().format('DD/MM/YYYYh:mm:ssa')}`,
+            message: `Customer List (Export on ${moment().format('DD/MM/YYYY h:mm:ss a')})`,
+            exportOptions: {
+              columns: [0, 1, 2, 4, 5]
+            },
+            className: 'excel-db'
+
+
+          },
+        ]
+      });
+
+      table.buttons(0, null).containers().appendTo($('.ex-btn'));
+
+      $('.myInputTextField').keyup(function () {
+        table.search($(this).val()).draw();
+
+
+
+      })
+
+    });
+
+    function filterCustomer() {
+      var chngRes = $('#chngRes').val();
+
+      window.location.replace(`/customer/customerList?filter=${chngRes}`);
+
+
+
+      //alert(chngRes);
+    }
+
+    function getLogHistory(customerId) {
+
+      $("#modal-xl").modal('show');
+
+      $.ajax({
+        url: "/customer/getLogHistory",
+        type: "POST",
+        data: { customerId: customerId },
+        success: function (data, textStatus, jqXHR) {
+
+          $(".log-content").html(data);
+
+          $(".loader").hide();
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          toastr.error(data.msg)
+        }
+      });
+
+    }
+
+    function deleteCustomer(customerId) {
+      if (confirm("Do you want to delete this customer?")) {
+        // your deletion code
+
+        window.location.replace(`/customer/customerDelete?customer=${customerId}`);
+      }
+      return false;
+    }
+
+
+    function changeCustomerStatus(customerId, status) {
+
+      if (status == 'Active') {
+        window.location.replace(`/customer/customerChangeStatus?id=${customerId}&status=${status}`);
+
+      } else {
+        window.location.replace(`/customer/customerChangeStatus?id=${customerId}&status=${status}`);
+        // $(".loader").hide();
+        // $("#modal-overlay-staus").modal('show');
+
+      }
+    }
+
+  </script>
+  <% if(messages.msgLog){ %>
+  <script>
+    $(function () {
+      $.notify({
+        // options
+        message: '<%= messages.msgLog %>'
+      }, {
+        // settings
+        type: '<%= messages.msgType %>',
+        spacing: 10,
+        z_index: 1035,
+        animate: {
+          enter: 'animated fadeInDown',
+          exit: 'animated fadeOutUp'
+        }
+      });
+    });
+  </script>
+  <% } %>
+
+</body>

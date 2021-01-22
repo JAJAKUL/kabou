@@ -1,0 +1,82 @@
+{
+    "portfoliodata": [{
+        "name": "Equity",
+        "type": "PARENT",
+        "liquidity": "NO",
+        "parentName": "",
+        "investedAmount": 139959,
+        "currentValue": 150342
+    }, {
+        "name": "Stocks",
+        "type": "CHILD",
+        "liquidity": "NO",
+        "parentName": "Equity",
+        "investedAmount": 70546,
+        "currentValue": 82988
+    }, {
+        "name": "Equity Mutual Fund",
+        "type": "CHILD",
+        "liquidity": "NO",
+        "parentName": "Equity",
+        "investedAmount": 69413,
+        "currentValue": 67354
+    }, {
+        "name": "Debt",
+        "type": "PARENT",
+        "liquidity": "YES",
+        "parentName": "",
+        "investedAmount": 19137,
+        "currentValue": 19550
+    }, {
+        "name": "Debt Mutual Fund",
+        "type": "CHILD",
+        "liquidity": "YES",
+        "parentName": "Debt",
+        "investedAmount": 19137,
+        "currentValue": 19550
+    }, {
+        "name": "Fixed Income",
+        "type": "PARENT",
+        "liquidity": "YES",
+        "parentName": "",
+        "investedAmount": 120000,
+        "currentValue": 124624
+    }, {
+        "name": "Recurring Deposit",
+        "type": "CHILD",
+        "liquidity": "YES",
+        "parentName": "Fixed Income",
+        "investedAmount": 120000,
+        "currentValue": 124624
+    }, {
+        "name": "Provident Fund",
+        "type": "PARENT",
+        "liquidity": "NO",
+        "parentName": "",
+        "investedAmount": 77022,
+        "currentValue": 77022
+    }, {
+        "name": "Employee Provident Fund",
+        "type": "CHILD",
+        "liquidity": "NO",
+        "parentName": "Provident Fund",
+        "investedAmount": 77022,
+        "currentValue": 77022
+    }, {
+        "name": "Cash",
+        "type": "PARENT",
+        "liquidity": "YES",
+        "parentName": "",
+        "investedAmount": 80325,
+        "currentValue": 80325
+    }, {
+        "name": "Insurance",
+        "type": "PARENT",
+        "liquidity": "NO",
+        "parentName": "",
+        "investedAmount": 201208,
+        "currentValue": 201208
+    }],
+    "totalInvestmentAmount": 637651, 
+    "currentValue": 653071
+}

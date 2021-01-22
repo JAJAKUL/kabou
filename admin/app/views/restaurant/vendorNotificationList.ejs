@@ -1,0 +1,174 @@
+<% layout('layout/afterlogin') -%>
+
+<body class="hold-transition sidebar-mini ">
+  <div class="wrapper">
+
+    <!-- Navbar -->
+    <% include ../layout/navbar %>
+
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <% include ../layout/sidebar %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>Notification List</h1>
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="row">
+          <div class="col-12">
+            <!-- /.card -->
+
+            <div class="card">
+              <!-- /.card-header -->
+              <div class="card-body">
+                <table id="restaurantList" class="table table-bordered table-striped" style="width:100%">
+                  <thead>
+                    <tr>
+                      <th>Restaurant Name</th>
+                      <th>Date</th>
+                      <th>Title</th>
+                      <th>Message</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (notificationArr.length > 0){
+                      var i = 1;%>
+                    <%  for (let notification of notificationArr){ %>
+                    <tr>
+                      
+                      <td><%= notification.vendor.restaurantName %></td>
+                      <td><%= notification.createdAt %></td>
+                      <td><%= notification.title %></td>
+                      <td><%= notification.content %></td>
+                      
+                      
+                      <td>
+                        <a href="/restaurant/vendorNotificationEdit?id=<%= notification._id %>"><i style="color: green;cursor: pointer;" class="fa fa-edit" title="Edit Notification"
+                          aria-hidden="true"></i> </a> |
+                        <i style="color: red;cursor: pointer;" class="fa fa-trash" title="Edit Notification"
+                          aria-hidden="true" onClick="javascript:deleteItem('<%= notification._id %>');"></i>
+
+                          <i style="color: black;cursor: pointer;" class="fas fa-share-square" title="Resend Notfication"
+                          aria-hidden="true" onClick="javascript:resendNotification('<%= notification._id %>');"></i>
+                      </td>
+                    </tr>
+                    <% i++;
+                   } %>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <% include ../layout/footer %>
+
+  </div>
+  <!-- ./wrapper -->
+
+
+  <!-- jQuery -->
+  <script src="../../plugins/jquery/jquery.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../js/bootstrap-notify.min.js"></script>
+  <!-- DataTables -->
+  <script src="../../plugins/datatables/jquery.dataTables.js"></script>
+  <script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
+  <!-- jquery-validation -->
+  <script src="../../plugins/jquery-validation/jquery.validate.min.js"></script>
+  <script src="../../plugins/jquery-validation/additional-methods.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="../../js/adminlte.min.js"></script>
+  <!-- Toastr -->
+  <script src="../../plugins/toastr/toastr.min.js"></script>
+
+  <script type="text/javascript">
+
+    $(function () {
+
+
+      var table = $('#restaurantList').removeAttr('width').DataTable({
+        fixedHeader: true,
+        scrollY: "400px",
+        scrollX: false,
+        scrollCollapse: false,
+        paging: false,
+        searching: true,
+        ordering: false,
+
+        // columnDefs: [
+        //     { width: 200, targets: 0 }
+        // ],
+        fixedColumns: true
+      });
+
+
+
+    });
+
+
+    function deleteItem(notId) {
+      if (confirm("Do you want to delete this notification?")) {
+        // your deletion code
+
+        window.location.replace(`/restaurant/vendorDeleteNotification?id=${notId}`);
+      }
+      return false;
+    }
+
+
+    function resendNotification(notId) {
+      if (confirm("Do you want to resend this notification?")) {
+        // your deletion code
+
+        window.location.replace(`/restaurant/sendPushPost?id=${notId}`);
+      }
+      return false;
+    }
+
+
+  </script>
+  <% if(messages.msgLog){ %>
+  <script>
+    $(function () {
+      $.notify({
+        // options
+        message: '<%= messages.msgLog %>'
+      }, {
+        // settings
+        type: '<%= messages.msgType %>',
+        spacing: 10,
+        z_index: 1035,
+        animate: {
+          enter: 'animated fadeInDown',
+          exit: 'animated fadeOutUp'
+        }
+      });
+    });
+  </script>
+  <% } %>
+
+</body>

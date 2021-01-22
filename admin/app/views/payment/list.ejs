@@ -1,0 +1,557 @@
+<% layout('layout/afterlogin') -%>
+  <style>
+    #restaurantList span {
+      display: none;
+    }
+
+    #restaurantList_filter {
+      display: none;
+    }
+  </style>
+
+  <body class="hold-transition sidebar-mini ">
+    <div class="wrapper">
+
+      <!-- Navbar -->
+      <% include ../layout/navbar %>
+
+        <!-- /.navbar -->
+
+        <!-- Main Sidebar Container -->
+        <% include ../layout/sidebar %>
+
+          <!-- Content Wrapper. Contains page content -->
+          <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+              <div class="container-fluid">
+                <div class="row mb-2">
+                  <div class="col-sm-6">
+                    <h1>Payment</h1>
+                  </div>
+                  <% if(customerId !='' ) {%>
+                    <div class="col-sm-2">
+                      <a href="/customer/customerList?id=<%= customerId %>" class="btn btn-block btn-danger">Back to
+                        Customer List</a>
+                    </div>
+                    <% } %>
+                </div>
+              </div><!-- /.container-fluid -->
+            </section>
+            <!-- Main content -->
+            <section class="content">
+              <div class="row">
+                <div class="col-12">
+                  <!-- /.card -->
+
+                  <div class="card">
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                      <div class="row">
+                        <div class="col-md-2">
+                          <div class="form-group">
+                            <label>Payment Type</label>
+                            <select class="form-control select2" id="paymentType">
+                              <% var allSel='' ; var cardSel='' ; var bankSel='' ; var ussdSel='' ;
+                                if(paymentType=='ALL' ) { allSel='selected' } if(paymentType=='CARD' ) {
+                                cardSel='selected' } if(paymentType=='BANK_TRANSFER' ) { bankSel='selected' }
+                                if(paymentType=='USSD' ) { ussdSel='selected' } %>
+
+                                <option value="all" <%=allSel%>>All</option>
+                                <option value="CARD" <%=cardSel%>>CARD</option>
+                                <option value="BANK_TRANSFER" <%=bankSel%>>BANK_TRANSFER</option>
+                                <option value="USSD" <%=ussdSel%>>USSD</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label>Select Restaurant</label>
+                            <select multiple class="form-control" id="chngRes" data-placeholder="Select Restaurant"
+                              style="width: 100%;" name="restaurant">
+                              <% if (vendors.length> 0){%>
+                                <% for (let vendor of vendors){ var vendrIdArr=vendorId; if (Array.isArray(vendrIdArr))
+                                  { var vendrId=(vendor._id).toString(); if(vendrIdArr.includes(vendrId)) { var
+                                  selectedOption='selected' ; } else { var selectedOption='' ; } } else
+                                  if(vendrIdArr=='' ) { var selectedOption='' ; } else { if(vendrIdArr==vendor._id) {
+                                  var selectedOption='selected' ; } else { var selectedOption='' ; } } %>
+
+                                  <option value="<%= vendor._id %>" <%=selectedOption %>><%= vendor.restaurantName %>
+                                  </option>
+                                  <% } } %>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="col-md-2">
+                          <div class="form-group">
+                            <label>From</label>
+                            <div class="input-group date validityFrom" data-provide="datepicker">
+                              <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                  <i class="far fa-calendar-alt"></i>
+                                </span>
+                              </div>
+                              <input type="text" class="form-control validityFromS" name="validityFrom"
+                                placeholder="Enter from date" value="<%= fromDate %>">
+                              <div class="input-group-addon">
+                                <span class="glyphicon glyphicon-th">
+
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                        </div>
+                        <div class="col-md-2">
+                          <div class="form-group">
+                            <label>To</label>
+                            <div class="input-group date validityTo" data-provide="datepicker">
+                              <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                  <i class="far fa-calendar-alt"></i>
+                                </span>
+                              </div>
+                              <input type="text" class="form-control validityToS" name="validityTo"
+                                placeholder="Enter to date" value="<%= toDate %>">
+                              <div class="input-group-addon">
+                                <span class="glyphicon glyphicon-th">
+
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                        </div>
+                        <div class="col-md-.5">
+                          <button type="button" class="btn btn-block btn-info" style="margin-top: 33px;"
+                            onclick="javascript:filterValidity();"><i class="fa fa-filter"
+                              aria-hidden="true"></i></button>
+                        </div>
+
+
+                        <div class="col-md-2 db-search">
+                          <div class="form-group">
+                            <label>Search</label>
+                            <input type="text" name="search" class="form-control myInputTextField" placeholder="Search" value="<%= searchTxt%>">
+                          </div>
+
+                        </div>
+                        <div class="col-md-.5">
+                          <button type="button" class="btn btn-block btn-info" style="margin-top: 33px;"
+                            onclick="javascript:searchData();"><i class="fa fa-search" aria-hidden="true"></i></button>
+                        </div>
+
+                      </div>
+                      <table id="restaurantList" class="table table-bordered table-striped" style="width:100%">
+                        <thead>
+                          <tr>
+                            <th>Amount (Customer Paid) </th>
+                            <th>Customer Payment Reference</th>
+                            <th>Payment Channel</th>
+                            <th>Paid On</th>
+                            <th>Restaurant</th>
+                            <th>Restaurant Receivable Amount</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <% if (paymentArr.length> 0){%>
+                            <% for (let payment of paymentArr){ %>
+                              <tr>
+                                <td>NGN <%= payment.totalAmount %>
+                                </td>
+                                <td>
+                                  <%= payment.customerPaymentReference %>
+                                </td>
+                                <td>
+                                  <%= payment.orderInfo.paymentType %>
+                                </td>
+                                <td>
+                                  <%= payment.customerPaymentTime %>
+                                </td>
+                                <td>
+                                  <%= payment.vendorInfo.restaurantName %>
+                                </td>
+                                <td>NGN <%= payment.vendorAmount %>
+                                </td>
+
+
+
+                                <td>
+                                  <i style="color: green;cursor: pointer;" class="fas fa-envelope-open-text"
+                                    title="Send Mail to Restaurant" aria-hidden="true"
+                                    onClick="javascript:sendReceiptEmail('<%= payment._id %>');"></i> |
+
+                                  <i style="color: black;cursor: pointer;" class="fas fa-share-square"
+                                    title="Transfer amount to Restaurant" aria-hidden="true"
+                                    onClick="javascript:sendAmount('<%= payment._id %>','<%= payment.vendorAmount %>');"></i>
+
+                                </td>
+                              </tr>
+                              <% } %>
+                                <% } %>
+                        </tbody>
+                      </table>
+                    </div>
+                    <!-- /.card-body -->
+                  </div>
+                  <!-- /.card -->
+                </div>
+                <!-- /.col -->
+              </div>
+              <!-- /.row -->
+            </section>
+            <!-- /.content -->
+          </div>
+          <!-- /.content-wrapper -->
+          <% include ../layout/footer %>
+
+    </div>
+    <div class="modal fade" id="modal-overlay-bank">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="loader">
+            <div class="overlay d-flex justify-content-center align-items-center">
+              <i class="fas fa-2x fa-sync fa-spin"></i>
+            </div>
+          </div>
+          <div class="modal-header">
+            <h4 class="modal-title">Payment Amount</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <form role="form" id="updateCommission" method="post">
+            <div class="modal-body">
+              <div class="input-group mb-3">
+                <label for="inputClientCompany" style="margin-right: 5px;">Amount to send</label>
+                <input type="number" id="inputClientCompany" class="form-control amountSend col-3" name="amount">
+                <div class="input-group-append">
+                  <span class="input-group-text">NGN</span>
+                </div>
+              </div>
+            </div>
+            <input type="hidden" name="paymentId" class="paymentId">
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" onclick="javascript:sendVendorAmount()">Save
+                changes</button>
+            </div>
+          </form>
+
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+    <div class="modal fade" id="modal-overlay-otp">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="loader">
+            <div class="overlay d-flex justify-content-center align-items-center">
+              <i class="fas fa-2x fa-sync fa-spin"></i>
+            </div>
+          </div>
+          <div class="modal-header">
+            <h4 class="modal-title">OTP</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <form role="form" id="sendOtps" method="post">
+            <div class="modal-body">
+              <div class="input-group mb-3">
+                <label for="inputClientCompany" style="margin-right: 5px;">OTP</label>
+                <input type="number" id="inputClientCompany" class="form-control otpC col-3" name="otp">
+              </div>
+            </div>
+            <input type="hidden" name="paymentId" class="paymentId">
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" onclick="javascript:sendOtp()">Save
+                changes</button>
+            </div>
+          </form>
+
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+    <!-- ./wrapper -->
+
+
+    <!-- jQuery -->
+    <script src="../../plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../../js/bootstrap-notify.min.js"></script>
+
+    <script src="../../js/jquery.multiselect.js"></script>
+    <!-- DataTables -->
+    <script src="../../plugins/datatables/jquery.dataTables.js"></script>
+    <script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
+    <!-- jquery-validation -->
+    <script src="../../plugins/jquery-validation/jquery.validate.min.js"></script>
+    <script src="../../plugins/jquery-validation/additional-methods.min.js"></script>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="../../js/adminlte.min.js"></script>
+    <!-- Toastr -->
+    <script src="../../plugins/toastr/toastr.min.js"></script>
+
+    <script type="text/javascript">
+
+      $(function () {
+
+
+        $('.myInputTextField').keyup(function () {
+          table.search($(this).val()).draw();
+        })
+
+        $(".validityFrom").datepicker({
+          format: 'dd/mm/yyyy',
+          autoclose: true,
+          showOtherMonths: true,
+          selectOtherMonths: true,
+          autoclose: true,
+          changeMonth: true,
+          changeYear: true,
+          orientation: "bottom left"
+        }).on('changeDate', function (selected) {
+          var startDate = new Date(selected.date.valueOf());
+          $('.validityTo').datepicker('setStartDate', startDate);
+        }).on('clearDate', function (selected) {
+          $('.validityTo').datepicker('setStartDate', null);
+        });
+
+        $(".validityTo").datepicker({
+          format: 'dd/mm/yyyy',
+          autoclose: true,
+          showOtherMonths: true,
+          selectOtherMonths: true,
+          autoclose: true,
+          changeMonth: true,
+          changeYear: true,
+          orientation: "bottom left"
+        }).on('changeDate', function (selected) {
+          var endDate = new Date(selected.date.valueOf());
+          $('.validityFrom').datepicker('setEndDate', endDate);
+        }).on('clearDate', function (selected) {
+          $('.validityFrom').datepicker('setEndDate', null);
+        });
+
+
+
+        var table = $('#restaurantList').removeAttr('width').DataTable({
+          fixedHeader: true,
+          scrollY: "400px",
+          scrollX: true,
+          scrollCollapse: false,
+          paging: false,
+          searching: true,
+          ordering: false,
+
+          // columnDefs: [
+          //     { width: 200, targets: 0 }
+          // ],
+          fixedColumns: true
+        });
+
+
+
+      });
+
+      function sendAmount(paymentId, vendorAmount) {
+
+        $("#modal-overlay-bank").modal('show');
+        $(".amountSend").val(vendorAmount);
+        $(".paymentId").val(paymentId);
+        $(".loader").hide();
+
+      }
+
+      function sendVendorAmount() {
+        var formData = $('#updateCommission').serialize()
+
+        var commissionVal = $(".amountSend").val();
+
+        if (commissionVal == '') {
+          toastr.error('Please enter amount')
+        } else if (isNaN(commissionVal)) {
+          toastr.error('Please enter valid amount')
+        } else {
+
+          $.ajax({
+            url: "/payment/sendVendorAmount",
+            type: "POST",
+            data: formData,
+            success: function (data, textStatus, jqXHR) {
+              //data - response from server
+
+              if (data.statusCode == 200) {
+                toastr.success(data.msg)
+                $('#modal-overlay-bank').modal('toggle');
+
+                $("#modal-overlay-otp").modal('show');
+              } else {
+                toastr.error(data.msg)
+              }
+
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              toastr.error('Something went wrong.')
+            }
+          });
+
+        }
+      }
+
+      function sendOtp() {
+        var formData = $('#sendOtps').serialize()
+
+        var otpC = $(".otpC").val();
+
+        if (otpC == '') {
+          toastr.error('Please enter OTP')
+        } else if (isNaN(otpC)) {
+          toastr.error('Please enter valid OTP')
+        } else {
+
+          $.ajax({
+            url: "/payment/sendOtp",
+            type: "POST",
+            data: formData,
+            success: function (data, textStatus, jqXHR) {
+              //data - response from server
+
+              if (data.statusCode == 200) {
+                toastr.success(data.msg)
+                $('#modal-overlay-otp').modal('toggle');
+
+                location.reload();
+              } else {
+                toastr.error(data.msg)
+              }
+
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              toastr.error('Something went wrong.')
+            }
+          });
+
+        }
+      }
+
+      function sendReceiptEmail(paymentId) {
+
+        $.ajax({
+          url: "/payment/sendReceiptEmail",
+          type: "POST",
+          data: { paymentId: paymentId },
+          success: function (data, textStatus, jqXHR) {
+            //data - response from server
+            // var reqBody = data.body;
+
+            if (data.statusCode == 200) {
+              toastr.success(data.msg)
+            } else {
+              toastr.error(data.msg)
+            }
+
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            toastr.error('Something went wrong.')
+
+
+          }
+        });
+
+      }
+
+      function changeBankStatus(accountId) {
+        $(".loader").show();
+
+        $.ajax({
+          url: "/restaurant/updateBankStatus",
+          type: "POST",
+          data: { accountId: accountId },
+          success: function (data, textStatus, jqXHR) {
+            //data - response from server
+            var reqBody = data.body;
+            if (reqBody.isActive == true) {
+              $(".bankActive").html('Active');
+              $(".businessName").html(reqBody.businessName);
+              $(".changeBankStatus").html(`<a href='javascript:void(0)' onClick="javascript:changeBankStatus('${accountId}')"> Click to change status</a>`);
+            } else {
+              $(".bankActive").html('Inactive');
+              $(".changeBankStatus").html(`<a href='javascript:void(0)' onClick="javascript:changeBankStatus('${accountId}')"> Click to change status</a>`);
+            }
+            $(".loader").hide();
+            toastr.success(data.msg)
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            toastr.error(data.msg)
+          }
+        });
+
+      }
+
+
+      function filterValidity() {
+        var customerId = '<%= customerId %>';
+        var restaurant = $("#chngRes").val();
+        var chngRes = restaurant.toString();
+
+        var paymentType = $("#paymentType").val();
+
+        var fromDate = $(".validityFromS").val();
+        var toDate = $(".validityToS").val();
+
+        window.location.replace(`/payment/paymentList?paymentType=${paymentType}&restaurant=${chngRes}&from=${fromDate}&to=${toDate}&customer=${customerId}`);
+      }
+
+      function searchData() {
+
+        var searchData = $(".myInputTextField").val();
+
+        window.location.replace(`/payment/paymentList?search=${searchData}`);
+
+      }
+
+      $('select[multiple]').multiselect({
+        columns: 2,
+        search: true,
+        selectAll: true,
+        texts: {
+          placeholder: 'Select Restaurant',
+          search: 'Search Restaurant'
+        }
+      });
+
+    </script>
+    <% if(messages.msgLog){ %>
+      <script>
+        $(function () {
+          $.notify({
+            // options
+            message: '<%= messages.msgLog %>'
+          }, {
+            // settings
+            type: '<%= messages.msgType %>',
+            spacing: 10,
+            z_index: 1035,
+            animate: {
+              enter: 'animated fadeInDown',
+              exit: 'animated fadeOutUp'
+            }
+          });
+        });
+      </script>
+      <% } %>
+
+  </body>

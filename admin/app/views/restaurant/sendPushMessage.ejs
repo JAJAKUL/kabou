@@ -1,0 +1,211 @@
+<% layout('layout/afterlogin') -%>
+
+<body class="hold-transition sidebar-mini">
+  <div class="wrapper">
+
+    <!-- Navbar -->
+    <% include ../layout/navbar %>
+
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <% include ../layout/sidebar %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>Send Push Message</h1>
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+
+      <section class="content">
+        <div class="container-fluid">
+          <!-- SELECT2 EXAMPLE -->
+          <div class="card card-default">
+            <!-- /.card-header -->
+            <form role="form" id="sendPush" method="post" action="/restaurant/sendPushPost"
+              enctype="multipart/form-data">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Select Restaurant</label>
+                        <select multiple data-placeholder="Select Restaurant"
+                          style="width: 100%;" name="restaurant" id="chngRes">
+                        <%
+                    if (vendors.length > 0){
+                      for (let vendor of vendors){ 
+                        
+                        var vendrId = (vendor._id).toString()%>
+                        <% if(vendorIdArr.includes(vendrId)) {
+                          var selectedOption = 'selected';
+                        } else {
+                          var selectedOption = '';
+                        }%>
+                        <option value="<%= vendor._id %>" <%= selectedOption %>><%= vendor.restaurantName %></option>
+                        <% } } %>
+                        <!-- <% if (vendors.length > 0){%>
+                        <%  for (let vendor of vendors){ %>
+                        <option value="<%= vendor._id %>"><%= vendor.restaurantName %></option>
+                        <% } } %> -->
+                      </select>
+                    </div>
+                    <!-- /.form-group -->
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Notification Title</label>
+                      <input type="text" class="form-control" placeholder="Enter Message Title"
+                        name="notificationTitle">
+                    </div>
+
+                    <div class="form-group">
+                      <label>Message</label>
+                      <input type="text" class="form-control" placeholder="Enter Push Message" name="pushMessage">
+                    </div>
+                    <!-- /.form-group -->
+
+                  </div>
+                  <!-- /.col -->
+                </div>
+                <!-- /.row -->
+
+              </div>
+              <div class="card-footer">
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+            </form>
+          </div>
+          <!--/.col (left) -->
+        </div>
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <% include ../layout/footer %>
+
+  </div>
+  <!-- ./wrapper -->
+
+
+  <!-- jQuery -->
+  <script src="../../plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <!-- Select2 -->
+  <script src="../../plugins/select2/js/select2.full.min.js"></script>
+  <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../js/bootstrap-notify.min.js"></script>
+
+  <script src="../../js/jquery.multiselect.js"></script>
+
+  <!-- InputMask -->
+  <script src="../../plugins/moment/moment.min.js"></script>
+  <script src="../../plugins/inputmask/min/jquery.inputmask.bundle.min.js"></script>
+
+  <!-- bs-custom-file-input -->
+  <script src="../../plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+  <!-- jquery-validation -->
+  <script src="../../plugins/jquery-validation/jquery.validate.min.js"></script>
+  <script src="../../plugins/jquery-validation/additional-methods.min.js"></script>
+  <!-- date-range-picker -->
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="../../js/adminlte.min.js"></script>
+
+  <script type="text/javascript">
+    $(function () {
+
+
+
+
+
+      bsCustomFileInput.init();
+
+      //Initialize Select2 Elements
+      $('.select2').select2()
+      // Initialize form validation on the registration form.
+      // It has the name attribute "registration"
+      $("#sendPush").validate({
+        // Specify validation rules
+        rules: {
+          restaurant: {
+            required: true
+          },
+          pushMessage: {
+            required: true
+          },
+          notificationTitle: {
+            required: true
+          }
+        },
+        // Specify validation error messages
+        messages: {
+          restaurant: {
+            required: 'Please select a restaurant'
+          },
+          pushMessage: {
+            required: 'Please enter message'
+          },
+          notificationTitle: {
+            required: 'Please enter notification title'
+          }
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+          error.addClass('invalid-feedback');
+          element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+          $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+          $(element).removeClass('is-invalid');
+        },
+        // Make sure the form is submitted to the destination defined
+        // in the "action" attribute of the form when valid
+        submitHandler: function (form) {
+          form.submit();
+        }
+      });
+    });
+
+    $('select[multiple]').multiselect({
+      columns  : 2,
+      search   : true,
+      selectAll: true,
+      texts    : {
+          placeholder: 'Select Restaurant',
+          search     : 'Search Restaurant'
+      }
+    });
+
+  </script>
+  <% if(messages.msgLog){ %>
+  <script>
+    $(function () {
+      $.notify({
+        // options
+        message: '<%= messages.msgLog %>'
+      }, {
+        // settings
+        type: '<%= messages.msgType %>',
+        z_index: 1035,
+        spacing: 10,
+        animate: {
+          enter: 'animated fadeInDown',
+          exit: 'animated fadeOutUp'
+        }
+      });
+    });
+  </script>
+  <% } %>
+
+</body>

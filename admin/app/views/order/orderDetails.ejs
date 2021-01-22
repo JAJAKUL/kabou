@@ -1,0 +1,338 @@
+<% layout('layout/afterlogin') -%>
+<style>
+  #restaurantList span {
+    display: none;
+  }
+
+  #restaurantList_filter {
+    display: none;
+  }
+</style>
+
+<body class="hold-transition sidebar-mini">
+  <div class="wrapper">
+
+    <!-- Navbar -->
+    <% include ../layout/navbar %>
+
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <% include ../layout/sidebar %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>Order Details</h1>
+            </div>
+            <div class="col-sm-6">
+
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+
+      <section class="content">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-12">
+
+
+              <!-- Main content -->
+              <div class="invoice p-3 mb-3">
+                <!-- title row -->
+                <div class="row">
+                  <div class="col-12">
+                    <h4>
+                      <i class="fas fa-globe"></i> <%= orderResp.restaurantName %>
+                      <small class="float-right">Date: <%= orderResp.orderTime%></small>
+                    </h4>
+                  </div>
+                  <!-- /.col -->
+                </div>
+                <!-- info row -->
+                <div class="row invoice-info">
+                  <div class="col-sm-4 invoice-col">
+                    From
+                    <address>
+                      <strong><%= orderResp.restaurantName %></strong><br>
+                      <%= orderResp.address %>
+                    </address>
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-sm-4 invoice-col">
+                    To
+                    <address>
+                      <strong><%= orderResp.customerName %></strong><br>
+                      <%= orderResp.deliveryFullAddress %>
+                      Phone: <%= orderResp.deliveryPhone %><br>
+                    </address>
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-sm-4 invoice-col">
+                    <b>Order ID:</b> <%= orderResp.orderNo %><br>
+                    <b>Order Status:</b> <%= orderResp.orderStatus %><br>
+                    <b>Food Preparation Time:</b> <%= orderResp.estimatedDeliveryTime.day %>
+                    Hour-<%= orderResp.estimatedDeliveryTime.hour %> Min-<%= orderResp.estimatedDeliveryTime.min %> Sec
+                    <br>
+                  </div>
+                  <!-- /.col -->
+                </div>
+                <!-- /.row -->
+
+                <!-- Table row -->
+                <div class="row">
+                  <div class="col-12 table-responsive">
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>Image</th>
+                          <th>Qty</th>
+                          <th>Item</th>
+                          <th>Item Price</th>
+                          <th>Subtotal</th>
+                          <th>More Details</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% var orderDetails = orderResp.orderDetails;
+                         if (orderDetails.length > 0){ %>
+                        <%  for (let orderDetail of orderDetails){ %>
+                        <tr>
+                          <td style="text-align: center; vertical-align: middle;"><img src="<%= orderDetail.image %>"
+                              height="100" width="100" alt="No Image"><br>
+                            <a href="<%= orderDetail.image %>" target="_blank"><i style="color: green;cursor: pointer;"
+                                class="fa fa-eye" title="Click to View Full" aria-hidden="true"></i></a></td>
+                          <td><%= orderDetail.quantity %></td>
+                          <td><%= orderDetail.item %></td>
+                          <td><%= orderDetail.itemPrice %></td>
+                          <td>₦<%= orderDetail.totalPrice %></td>
+                          <td>
+
+                            <i style="color: green;cursor: pointer;" class="fa fa-info-circle" title="Details"
+                              aria-hidden="true"
+                              onClick="javascript:fetchItemDetails('<%= orderResp._id %>');"></i>
+                          </td>
+                        </tr>
+                        <% } %>
+                        <% } %>
+                      </tbody>
+                    </table>
+                  </div>
+                  <!-- /.col -->
+                </div>
+                <!-- /.row -->
+
+                <div class="row">
+                  <!-- accepted payments column -->
+                  <div class="col-6">
+                    <p class="lead">Payment Methods:</p>
+                    <p><%= orderResp.paymentMode %></p>
+
+                    <% if(orderResp.paymentMode == 'CARD') {%>
+                    <p class="lead">Payment Details:</p>
+                    <p><%= orderResp.paymentDetails %></p>
+
+                    <% } %>
+
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-6">
+
+
+                    <div class="table-responsive">
+                      <table class="table">
+                        <tr>
+                          <th style="width:50%">Subtotal:</th>
+                          <td>₦<%= orderResp.price %></td>
+                        </tr>
+                        <tr>
+                          <th>Discount:</th>
+                          <td>₦<%= orderResp.discount %></td>
+                        </tr>
+                        <tr>
+                          <th>Final Price:</th>
+                          <td>₦<%= orderResp.finalPrice %></td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                  <!-- /.col -->
+                </div>
+                <!-- /.row -->
+
+
+              </div>
+              <!-- /.invoice -->
+            </div><!-- /.col -->
+          </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <% include ../layout/footer %>
+
+    <!-- /.control-sidebar -->
+  </div>
+  <div class="modal fade" id="modal-overlay-item">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="loader">
+          <div class="overlay d-flex justify-content-center align-items-center">
+            <i class="fas fa-2x fa-sync fa-spin"></i>
+          </div>
+        </div>
+        <div class="modal-header">
+          <h4 class="modal-title">Menu Details</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <h5>Menu Option: </h5>
+          <div class="menuOption"></div>
+          <hr>
+          <h5>Menu Extra: </h5>
+          <div class="menuExtra"></div>
+          <hr>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- ./wrapper -->
+
+
+  <!-- jQuery -->
+  <script src="../../plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../js/bootstrap-notify.min.js"></script>
+  <!-- Select2 -->
+  <script src="../../plugins/select2/js/select2.full.min.js"></script>
+  <!-- DataTables -->
+  <script src="../../plugins/datatables/jquery.dataTables.js"></script>
+  <script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
+  <!-- jquery-validation -->
+  <script src="../../plugins/jquery-validation/jquery.validate.min.js"></script>
+  <script src="../../plugins/jquery-validation/additional-methods.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="../../js/adminlte.min.js"></script>
+  <!-- Toastr -->
+  <script src="../../plugins/toastr/toastr.min.js"></script>
+
+  <script type="text/javascript">
+
+function fetchItemDetails(itemId) {
+
+$("#modal-overlay-item").modal('show');
+$(".menuExtra").html('');
+$(".menuOption").html('');
+$(".amount").html('');
+$(".validFrom").html('');
+$(".validTo").html('');
+
+$.ajax({
+  url: "/order/fetchOrderDetails",
+  type: "POST",
+  data: { itemId: itemId },
+  success: function (data, textStatus, jqXHR) {
+    //data - response from server
+    var reqBody = data.body;
+    if (reqBody != null) {
+
+
+      var itemExtra = reqBody.itemExtras;
+
+
+      if (itemExtra.length > 0) {
+        var extraHtml = ''
+        for (let itemEx of itemExtra) {
+          extraHtml += `<span style="margin-right: 30px;">${itemEx.itemName}</span> <span style="margin-left: 30px;">₦${itemEx.price}</span><br>`;
+        }
+        $(".menuExtra").html(extraHtml);
+
+      }
+
+      var itemOptions = reqBody.itemOptions;
+
+      if (itemOptions.length > 0) {
+        var extraHtmlOp = ''
+        for (let itemOp of itemOptions) {
+          extraHtmlOp += `<p style="background: #d4d4cd;">${itemOp.optionTitle}</p>`;
+          if (itemOp.arrOptions.length > 0) {
+            extraHtmlOp += `<ul>`
+            for (let arrOption of itemOp.arrOptions) {
+              extraHtmlOp += `<li>${arrOption.name}</li>`;
+            }
+            extraHtmlOp += `</ul>`
+          }
+
+        }
+        $(".menuOption").html(extraHtmlOp);
+
+      }
+
+      $(".discount").html(reqBody.discountType);
+      $(".amount").html(reqBody.discountAmount);
+      $(".validFrom").html(reqBody.validityFrom);
+      $(".validTo").html(reqBody.validityTo);
+
+
+    } else {
+      $(".accountNo").text(reqBody.accountNo);
+      $(".businessName").text(reqBody.businessName);
+      $(".accountName").text(reqBody.accountName);
+      if (reqBody.vendorPayment == null) {
+        $(".commission").text('--');
+      } else {
+        $(".commission").text(reqBody.vendorPayment.paymentPercentage);
+      }
+
+
+      if (reqBody.isActive == true) {
+        $(".bankActive").text('Active');
+        // $(".changeBankStatus").html(`<a href='javascript:void(0)' onClick="javascript:changeBankStatus('${reqBody._id}')"> Click to change status</a>`);
+      } else {
+        $(".bankActive").html('Inactive');
+        // $(".changeBankStatus").html(`<a href='javascript:void(0)' onClick="javascript:changeBankStatus('${reqBody._id}')"> Click to change status</a>`);
+      }
+    }
+    $(".loader").hide();
+  },
+  error: function (jqXHR, textStatus, errorThrown) {
+    toastr.error(data.msg)
+  }
+});
+
+}
+
+  </script>
+  <% if(messages.msgLog){ %>
+  <script>
+    $(function () {
+
+
+      $.notify({
+        // options
+        message: '<%= messages.msgLog %>'
+      }, {
+        // settings
+        type: '<%= messages.msgType %>',
+        spacing: 10,
+        z_index: 1035,
+        animate: {
+          enter: 'animated fadeInDown',
+          exit: 'animated fadeOutUp'
+        }
+      });
+    });
+  </script>
+  <% } %>
+</body>

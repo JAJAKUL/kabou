@@ -1,0 +1,281 @@
+<% layout('layout/afterlogin') -%>
+
+<body class="hold-transition sidebar-mini">
+  <div class="wrapper">
+
+    <!-- Navbar -->
+    <% include ../layout/navbar %>
+
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <% include ../layout/sidebar %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>Dashboard</h1>
+            </div>
+            <div class="col-sm-6">
+              <ol class="breadcrumb float-sm-right">
+              </ol>
+            </div><!-- /.col -->
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="container-fluid">
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="card-title">Restaurant</h5>
+
+                  <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                      <i class="fas fa-minus"></i>
+                    </button>
+
+                  </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-lg-4 col-6">
+                      <!-- small box -->
+                      <div class="small-box bg-info">
+                        <div class="inner">
+                          <h3><%- responseObj.allVendor %></h3>
+
+                          <p>Total Restaurants</p>
+                        </div>
+                        <div class="icon">
+                          <i class="fa fa-window-maximize" aria-hidden="true"></i>
+                        </div>
+                        <a href="restaurant/vendorList" class="small-box-footer">More info <i
+                            class="fa fa-arrow-circle-right"></i></a>
+
+                      </div>
+                    </div>
+                    <!-- ./col -->
+                    <!-- ./col -->
+
+                    <!-- ./col -->
+                    <div class="col-lg-4 col-6">
+                      <!-- small box -->
+                      <div class="small-box bg-warning">
+                        <div class="inner">
+                          <h3><%- responseObj.itemUnapproved %></h3>
+
+                          <p>Unapproved Items</p>
+                        </div>
+                        <div class="icon">
+                          <i class="fas fa-hamburger"></i>
+                        </div>
+                        <a href="restaurant/unapprovedItemList?restaurant=all&isApprove=false"
+                          class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+
+                      </div>
+                    </div>
+                    <!-- ./col -->
+                    <div class="col-lg-4 col-6">
+                      <!-- small box -->
+                      <div class="small-box bg-info">
+                        <div class="inner">
+                          <h3><%- responseObj.allAccountInactive %></h3>
+
+                          <p>Inactive Account</p>
+                        </div>
+                        <div class="icon">
+                          <i class="fa fa-university" aria-hidden="true"></i>
+                        </div>
+                        <a href="restaurant/bankAccountList?filter=inactive" class="small-box-footer">More info <i
+                            class="fa fa-arrow-circle-right"></i></a>
+
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <div class="row">
+                    <div class="col-12 col-sm-6 col-md-3">
+                      <a href="restaurant/disableList">
+                      <div class="info-box">
+                        <span class="info-box-icon bg-info elevation-1"><i class="fas fa-microphone-slash"></i></span>
+
+                        <div class="info-box-content">
+                          <span class="info-box-text">Disable List</span>
+                        </div>
+                        <!-- /.info-box-content -->
+                      </div>
+                    </a>
+                      <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-12 col-sm-6 col-md-3">
+                      <a href="restaurant/bankAccountList">
+                      <div class="info-box mb-3">
+                        <span class="info-box-icon bg-danger elevation-1"><i class="fa fa-university"></i></span>
+
+                        <div class="info-box-content">
+                          <span class="info-box-text">Bank Account</span>
+                        </div>
+                        <!-- /.info-box-content -->
+                      </div>
+                      </a>
+                      <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+
+                    <!-- fix for small devices only -->
+                    <div class="clearfix hidden-md-up"></div>
+
+                    <div class="col-12 col-sm-6 col-md-3">
+                      <a href="restaurant/sendPushMessage">
+                      <div class="info-box mb-3">
+                        <span class="info-box-icon bg-success elevation-1"><i class="fas fa-comment-dots"></i></span>
+
+                        <div class="info-box-content">
+                          <span class="info-box-text">Send Push Message</span>
+                        </div>
+                        <!-- /.info-box-content -->
+                      </div>
+                    </a>
+                      <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-12 col-sm-6 col-md-3">
+                      <a href="restaurant/vendorNotificationList">
+                        <div class="info-box mb-3">
+                          <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-bell"></i></span>
+
+                          <div class="info-box-content">
+                            <span class="info-box-text">Notification List</span>
+                          </div>
+                          <!-- /.info-box-content -->
+                        </div>
+                      </a>
+                      <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                  </div>
+
+                  <!-- /.row -->
+                </div>
+                <!-- ./card-body -->
+                <!-- /.card-footer -->
+              </div>
+              <!-- /.card -->
+            </div>
+            <!-- /.col -->
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="card-title">Customer</h5>
+
+                  <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                      <i class="fas fa-minus"></i>
+                    </button>
+
+                  </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                  <div class="row">
+
+
+                    <div class="col-lg-4 col-6">
+                      <!-- small box -->
+                      <div class="small-box bg-danger">
+                        <div class="inner">
+                          <h3><%- responseObj.allCustomers %></h3>
+
+                          <p>Total Customers</p>
+                        </div>
+                        <div class="icon">
+                          <i class="fas fa-user" aria-hidden="true"></i>
+                        </div>
+                        <a href="customer/customerList" class="small-box-footer">More info <i
+                          class="fa fa-arrow-circle-right"></i></a>
+
+
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <div class="row">
+                   
+
+                    <div class="col-12 col-sm-6 col-md-3">
+                      <a href="customer/customerSendPushMessage">
+                      <div class="info-box mb-3">
+                        <span class="info-box-icon bg-success elevation-1"><i class="fas fa-comment-dots"></i></span>
+
+                        <div class="info-box-content">
+                          <span class="info-box-text">Send Push Message</span>
+                        </div>
+                        <!-- /.info-box-content -->
+                      </div>
+                    </a>
+                      <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-12 col-sm-6 col-md-3">
+                      <a href="customer/customerNotificationList">
+                        <div class="info-box mb-3">
+                          <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-bell"></i></span>
+
+                          <div class="info-box-content">
+                            <span class="info-box-text">Notification List</span>
+                          </div>
+                          <!-- /.info-box-content -->
+                        </div>
+                      </a>
+                      <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                  </div>
+
+                  <!-- /.row -->
+                </div>
+                <!-- ./card-body -->
+                <!-- /.card-footer -->
+              </div>
+              <!-- /.card -->
+            </div>
+            <!-- /.col -->
+          </div>
+
+
+        </div><!-- /.container-fluid -->
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <% include ../layout/footer %>
+
+  </div>
+  <!-- ./wrapper -->
+
+
+  <!-- jQuery -->
+  <script src="../../plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="../../js/adminlte.min.js"></script>
+  <!-- page script -->
+
+</body>

@@ -1,0 +1,547 @@
+<% layout('layout/afterlogin') -%>
+<style>
+  #restaurantList span {
+    display: none;
+  }
+
+  #restaurantList_filter {
+    display: none;
+  }
+</style>
+
+<body class="hold-transition sidebar-mini ">
+  <div class="wrapper">
+
+    <!-- Navbar -->
+    <% include ../layout/navbar %>
+
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <% include ../layout/sidebar %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>Item list</h1>
+            </div>
+            <% if(itemIdTxt != '') {%>
+              <div class="col-sm-2">
+                <a href="/adminNotificationList" class="btn btn-block btn-danger">Back to Notification List</a>
+              </div>
+              <% } %>
+          </div>
+          
+        </div><!-- /.container-fluid -->
+      </section>
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="row">
+          <div class="col-12">
+            <!-- /.card -->
+
+            <div class="card">
+              <!-- /.card-header -->
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-2">
+                    <div class="form-group">
+                      <label>Order Status</label>
+                      <select class="form-control select2" id="changeOrder">
+                        <%
+                      var allSel = '';
+                      var newSel = '';
+        
+                      if(isApprove == 'false') {
+                        allSel = 'selected'
+                      } 
+                      if(isApprove == 'true') {
+                        newSel = 'selected'
+                      } 
+                      if(isApprove == 'all') {
+                        newSel = 'selected'
+                      } %>
+        
+                      <option value="all" <%= newSel%>>All Item</option>
+                        <option value="false" <%= allSel%>>Unapproved Item</option>
+                        <option value="true" <%= newSel%>>Approved Item</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label>Select Restaurant</label>
+                      <select multiple class="form-control" id="chngRes" data-placeholder="Select Restaurant"
+                        style="width: 100%;" name="restaurant">
+                        <% if (allRestaurant.length > 0){%>
+                          <%  for (let vendor of allRestaurant){ 
+                            var vendrIdArr = vendorId;
+                            if (Array.isArray(vendrIdArr)) { 
+                             
+                              var vendrId = (vendor._id).toString();
+                               if(vendrIdArr.includes(vendrId)) {
+                                var selectedOption = 'selected';
+                              } else {
+                                var selectedOption = '';
+                              }
+                               } else if(vendrIdArr == '') {
+                                var selectedOption = '';
+                               } else {
+                               if(vendrIdArr == vendor._id) {
+                                var selectedOption = 'selected';
+                               } else {
+                                var selectedOption = '';
+                               }
+                               } %>
+        
+                        <option value="<%= vendor._id %>" <%= selectedOption %>><%= vendor.restaurantName %></option>
+                        <% } } %>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    <div class="form-group">
+                      <label>From</label>
+                      <div class="input-group date validityFrom" data-provide="datepicker">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="far fa-calendar-alt"></i>
+                          </span>
+                        </div>
+                        <input type="text" class="form-control validityFromS" name="validityFrom"
+                          placeholder="Enter from date" value="<%= fromDate %>">
+                        <div class="input-group-addon">
+                          <span class="glyphicon glyphicon-th">
+        
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+        
+                  </div>
+                  <div class="col-md-2">
+                    <div class="form-group">
+                      <label>To</label>
+                      <div class="input-group date validityTo" data-provide="datepicker">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="far fa-calendar-alt"></i>
+                          </span>
+                        </div>
+                        <input type="text" class="form-control validityToS" name="validityTo"
+                          placeholder="Enter to date" value="<%= toDate %>">
+                        <div class="input-group-addon">
+                          <span class="glyphicon glyphicon-th">
+        
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+        
+                  </div>
+                  <div class="col-md-1">
+                    <button type="button" class="btn btn-block btn-info" style="margin-top: 33px;"
+                      onclick="javascript:filterValidity();">Filter</button>
+                  </div>
+        
+        
+                  <div class="col-md-2 db-search">
+                    <div class="form-group">
+                      <label>Search</label>
+                      <input type="text" name="search" class="form-control myInputTextField" placeholder="Search">
+                    </div>
+        
+                  </div>
+        
+                </div>
+
+                <table id="restaurantList" class="table table-bordered table-striped" style="width:100%">
+                  <thead>
+                    <tr>
+                      <th class="no-sort">Item Image</th>
+                      <th>Item Name </th>
+                      <th class="no-sort">Price</th>
+                      <th>Offer</th>
+                      <th>Restaurant Name</th>
+                      <th class="no-sort">Category</th>
+                      <th class="no-sort">Approve Status</th>
+                      <th>Created On</th>
+                      <th>Last Updated On</th>
+                      <th class="no-sort">More Details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (itemResponsesArr.length > 0){%>
+                    <%  for (let itemResponse of itemResponsesArr){ %>
+                    <tr>
+                      <td style="text-align: center; vertical-align: middle;"><img
+                          src="<%= `${serverImagePath}${itemResponse.menuImage}` %>" height="100" width="100"
+                          alt="No Image"><br>
+                        <a href="<%= `${serverImagePath}${itemResponse.menuImage}` %>" target="_blank"><i
+                            style="color: green;cursor: pointer;" class="fa fa-eye" title="Click to View Full"
+                            aria-hidden="true"></i></a></td>
+                      <td><%= itemResponse.itemName %></td>
+                      <td>₦ <%= itemResponse.price %> </td>
+                      <td>
+                        <% if (itemResponse.discountType == 'NONE' ){ %>
+                        <%= itemResponse.discountType %>
+
+                        <% } else if (itemResponse.discountType == 'FLAT' ){ %>
+                        <%= itemResponse.discountType %> <%= itemResponse.discountAmount %>₦
+                        <% } else { %>
+                        <%= itemResponse.discountAmount %> %
+                        <% } %>
+
+                      </td>
+                      <td>
+                        <% if (itemResponse.vendor != null ){%>
+                        <%= itemResponse.vendor.restaurantName %>
+                        <% }%>
+                      </td>
+
+                      <td>
+                        <% if (itemResponse.category != null ){%>
+                        <%= itemResponse.category.categoryName %>
+                        <% }%>
+                      </td>
+                      <td class="vendorStatus"><% if (itemResponse.isApprove == true){%>
+                        <button type="button" class="btn btn-block btn-success"
+                          onclick="window.location.href = '/restaurant/changeItemApprove?id=<%= itemResponse._id %>&status=Active'">Active</button>
+                        <% }else { %>
+                        <button type="button" class="btn btn-block btn-danger"
+                          onclick="window.location.href = '/restaurant/changeItemApprove?id=<%= itemResponse._id %>&status=Inactive'">Inactive</button>
+                        <% } %>
+                      </td>
+                      <td>
+                        <span><%= moment(itemResponse.createdAt).format('YYYYMMDDhhmmss'); %></span><%= moment(itemResponse.createdAt).format('DD/MM/YYYY h:mm:ss a'); %>
+                      </td>
+                      <td>
+                        <span><%= moment(itemResponse.updatedAt).format('YYYYMMDDhhmmss'); %></span><%= moment(itemResponse.updatedAt).format('DD/MM/YYYY h:mm:ss a'); %>
+                      </td>
+                      <td>
+
+
+                        <i style="color: green;cursor: pointer;" class="fa fa-info-circle" title="Details"
+                          aria-hidden="true" onClick="javascript:fetchItemDetails('<%= itemResponse._id %>');"></i>
+
+                        <a href="/restaurant/itemEdit?itemId=<%= itemResponse._id %>"><i
+                            style="color: green;cursor: pointer;" class="fa fa-edit" title="Edit Item"
+                            aria-hidden="true"></i> </a>
+
+                        <i style="color: red;cursor: pointer;" class="fa fa-trash" title="Delete Item"
+                          aria-hidden="true" onClick="javascript:deleteItem('<%= itemResponse._id %>');"></i>
+                      </td>
+
+                    </tr>
+                    <% } %>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <% include ../layout/footer %>
+
+  </div>
+  <div class="modal fade" id="modal-overlay-item">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="loader">
+          <div class="overlay d-flex justify-content-center align-items-center">
+            <i class="fas fa-2x fa-sync fa-spin"></i>
+          </div>
+        </div>
+        <div class="modal-header">
+          <h4 class="modal-title">Menu Details</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <h5>Menu Option: </h5>
+          <div class="menuOption"></div>
+          <hr>
+          <h5>Menu Extra: </h5>
+          <div class="menuExtra"></div>
+          <hr>
+          <h5>Discount: </h5>
+          <p class="discount"></p>
+          <hr>
+          <h5>Amount: </h5>
+          <p class="amount"></p>
+          <hr>
+          <h5>Valid From: </h5>
+          <p class="validFrom"> </p>
+          <hr>
+          <h5>Valid To: </h5>
+          <p class="validTo"> </p>
+          <hr>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- ./wrapper -->
+
+
+  <!-- jQuery -->
+  <script src="../../plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../js/bootstrap-notify.min.js"></script>
+  <!-- Select2 -->
+  <script src="../../plugins/select2/js/select2.full.min.js"></script>
+
+  <script src="../../js/jquery.multiselect.js"></script>
+  <!-- DataTables -->
+  <script src="../../plugins/datatables/jquery.dataTables.js"></script>
+  <script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
+  <!-- jquery-validation -->
+  <script src="../../plugins/jquery-validation/jquery.validate.min.js"></script>
+  <script src="../../plugins/jquery-validation/additional-methods.min.js"></script>
+  <!-- Bootstrap Switch -->
+  <script src="../../plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="../../js/adminlte.min.js"></script>
+  <!-- Toastr -->
+  <script src="../../plugins/toastr/toastr.min.js"></script>
+
+  <script type="text/javascript">
+
+    $(function () {
+
+      $('.myInputTextField').keyup(function () {
+        table.search($(this).val()).draw();
+      })
+
+      $(".validityFrom").datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        showOtherMonths: true,
+        selectOtherMonths: true,
+        autoclose: true,
+        changeMonth: true,
+        changeYear: true,
+        orientation: "bottom left"
+      }).on('changeDate', function (selected) {
+        var startDate = new Date(selected.date.valueOf());
+        $('.validityTo').datepicker('setStartDate', startDate);
+      }).on('clearDate', function (selected) {
+        $('.validityTo').datepicker('setStartDate', null);
+      });
+
+      $(".validityTo").datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        showOtherMonths: true,
+        selectOtherMonths: true,
+        autoclose: true,
+        changeMonth: true,
+        changeYear: true,
+        orientation: "bottom left"
+      }).on('changeDate', function (selected) {
+        var endDate = new Date(selected.date.valueOf());
+        $('.validityFrom').datepicker('setEndDate', endDate);
+      }).on('clearDate', function (selected) {
+        $('.validityFrom').datepicker('setEndDate', null);
+      });
+
+      $("input[data-bootstrap-switch]").each(function () {
+        $(this).bootstrapSwitch('state', $(this).prop('checked'));
+      });
+
+      $('.select2').select2()
+
+
+      var table = $('#restaurantList').removeAttr('width').DataTable({
+        fixedHeader: true,
+        scrollY: "400px",
+        scrollX: true,
+        scrollCollapse: false,
+        paging: false,
+        searching: true,
+        ordering: true,
+        columnDefs: [{
+          orderable: false,
+          targets: "no-sort"
+        }],
+        "order": [[7, "desc"]],
+
+        // columnDefs: [
+        //     { width: 200, targets: 0 }
+        // ],
+        fixedColumns: true
+      });
+
+
+
+    });
+
+    function fetchItemDetails(itemId) {
+
+      $("#modal-overlay-item").modal('show');
+      $(".menuExtra").html('');
+      $(".menuOption").html('');
+      $(".amount").html('');
+      $(".validFrom").html('');
+      $(".validTo").html('');
+
+      $.ajax({
+        url: "/restaurant/fetchMenuDetails",
+        type: "POST",
+        data: { itemId: itemId },
+        success: function (data, textStatus, jqXHR) {
+          //data - response from server
+          var reqBody = data.body;
+          if (reqBody != null) {
+
+
+            var itemExtra = reqBody.itemExtra;
+
+
+            if (itemExtra.length > 0) {
+              var extraHtml = ''
+              for (let itemEx of itemExtra) {
+                extraHtml += `<span style="margin-right: 30px;">${itemEx.itemName}</span> <span style="margin-left: 30px;">₦${itemEx.price}</span><br>`;
+              }
+              $(".menuExtra").html(extraHtml);
+
+            }
+
+            var itemOptions = reqBody.itemOptions;
+
+
+            if (itemOptions.length > 0) {
+              var extraHtmlOp = ''
+              for (let itemOp of itemOptions) {
+                extraHtmlOp += `<p style="background: #d4d4cd;">${itemOp.optionTitle}</p>`;
+                if (itemOp.arrOptions.length > 0) {
+                  extraHtmlOp += `<ul>`
+                  for (let arrOption of itemOp.arrOptions) {
+                    extraHtmlOp += `<li>${arrOption.name}</li>`;
+                  }
+                  extraHtmlOp += `</ul>`
+                }
+
+              }
+              $(".menuOption").html(extraHtmlOp);
+
+            }
+
+            $(".discount").html(reqBody.discountType);
+            $(".amount").html(reqBody.discountAmount);
+            $(".validFrom").html(reqBody.validityFrom);
+            $(".validTo").html(reqBody.validityTo);
+
+
+          } else {
+            $(".accountNo").text(reqBody.accountNo);
+            $(".businessName").text(reqBody.businessName);
+            $(".accountName").text(reqBody.accountName);
+            if (reqBody.vendorPayment == null) {
+              $(".commission").text('--');
+            } else {
+              $(".commission").text(reqBody.vendorPayment.paymentPercentage);
+            }
+
+
+            if (reqBody.isActive == true) {
+              $(".bankActive").text('Active');
+              // $(".changeBankStatus").html(`<a href='javascript:void(0)' onClick="javascript:changeBankStatus('${reqBody._id}')"> Click to change status</a>`);
+            } else {
+              $(".bankActive").html('Inactive');
+              // $(".changeBankStatus").html(`<a href='javascript:void(0)' onClick="javascript:changeBankStatus('${reqBody._id}')"> Click to change status</a>`);
+            }
+          }
+          $(".loader").hide();
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          toastr.error(data.msg)
+        }
+      });
+
+    }
+    function changeRestaurant() { 
+      var chngRes = $('#chngRes').val();
+
+      window.location.replace(`/restaurant/unapprovedItemList?restaurant=${chngRes}&isApprove=false`);
+      //alert(chngRes);
+    }
+
+
+    function deleteItem(notId) {
+      if (confirm("Do you want to delete this item?")) {
+        // your deletion code
+
+        window.location.replace(`/restaurant/itemDelete?itemId=${notId}`);
+      }
+      return false;
+    }
+
+    function filterValidity() {
+      var restaurant = $("#chngRes").val();
+      var chngRes = restaurant.toString();
+
+      var changeOrder = $('#changeOrder').val();
+
+      var fromDate = $(".validityFromS").val();
+      var toDate = $(".validityToS").val();
+ 
+      window.location.replace(`/restaurant/unapprovedItemList?isApprove=${changeOrder}&restaurant=${chngRes}&from=${fromDate}&to=${toDate}`);
+    }
+
+
+    $('select[multiple]').multiselect({
+      columns: 2,
+      search: true,
+      selectAll: true,
+      texts: {
+        placeholder: 'Select Restaurant',
+        search: 'Search Restaurant'
+      }
+    });
+
+
+  </script>
+  <% if(messages.msgLog){ %>
+  <script>
+    $(function () {
+      $.notify({
+        // options
+        message: '<%= messages.msgLog %>'
+      }, {
+        // settings
+        type: '<%= messages.msgType %>',
+        spacing: 10,
+        z_index: 1035,
+        animate: {
+          enter: 'animated fadeInDown',
+          exit: 'animated fadeOutUp'
+        }
+      });
+    });
+
+  </script>
+  <% } %>
+
+
+
+
+</body>

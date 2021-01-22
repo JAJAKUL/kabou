@@ -1,0 +1,706 @@
+<% layout('layout/afterlogin') -%>
+<style>
+  #restaurantList span {
+    display: none;
+  }
+
+  #restaurantList_filter {
+    display: none;
+  }
+</style>
+<!-- daterange picker -->
+<link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
+
+<body class="hold-transition sidebar-mini ">
+  <div class="wrapper">
+
+    <!-- Navbar -->
+    <% include ../layout/navbar %>
+
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <% include ../layout/sidebar %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>Restaurant List</h1>
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="row">
+          <div class="col-12">
+            <!-- /.card -->
+
+            <div class="card">
+              <!-- /.card-header -->
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label>Filter</label>
+                      <select class="form-control select2" id="chngRes" onchange="javascript:filterRestaurant();">
+                        <%
+                      var allSel = '';
+                      var activeSel = '';
+                      var inactiveSel = '';
+                      var durationSel = '';
+                      if(vendorCondtxt == 'all') {
+                        allSel = 'selected'
+                      } 
+                      if(vendorCondtxt == 'active') {
+                        activeSel = 'selected'
+                      }
+                      if(vendorCondtxt == 'inactive') {
+                        inactiveSel = 'selected'
+                      }
+                      if(vendorCondtxt == 'duration') {
+                        durationSel = 'selected'
+                      }%>
+
+                        <option value="all" <%= allSel%>>All</option>
+                        <option value="active" <%= activeSel%>>Active</option>
+                        <option value="inactive" <%= inactiveSel%>>Inactive</option>
+                        <option value="duration" <%= durationSel%>>Duration</option>
+                      </select>
+                    </div>
+                  </div>
+                  <% if(vendorCondFrom != '') { 
+                    var durationDisplay = ''
+                  } else {
+                    var durationDisplay = 'display: none;'
+                  }%>
+                  <div class="filtr-duration row" style="<%= durationDisplay %>">
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label>From</label>
+                        <div class="input-group date validityFrom" data-provide="datepicker">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">
+                              <i class="far fa-calendar-alt"></i>
+                            </span>
+                          </div>
+                          <input type="text" class="form-control validityFromS" name="validityFrom"
+                            placeholder="Enter from date" value="<%= vendorCondFrom %>">
+                          <div class="input-group-addon">
+                            <span class="glyphicon glyphicon-th">
+
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label>To</label>
+                        <div class="input-group date validityTo" data-provide="datepicker">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">
+                              <i class="far fa-calendar-alt"></i>
+                            </span>
+                          </div>
+                          <input type="text" class="form-control validityToS" name="validityTo"
+                            placeholder="Enter to date" value="<%= vendorCondTo %>">
+                          <div class="input-group-addon">
+                            <span class="glyphicon glyphicon-th">
+
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                    <div class="col-md-2">
+                      <button type="button" class="btn btn-block btn-info" style="margin-top: 33px;"
+                        onclick="javascript:filterValidity();">Filter</button>
+                    </div>
+                  </div>
+                  <div class="col-md-2 ex-btn" style="margin-top: 33px;">
+
+                  </div>
+                  <div class="col-md-3 db-search">
+                    <div class="form-group">
+                      <label>Search</label>
+                      <input type="text" name="search" class="form-control myInputTextField" placeholder="Search">
+                    </div>
+
+                  </div>
+                  <div class="col-md-2" style="margin-top: 33px;">
+                    <% if(vendorCondtxt!= '') {%> <button type="button" class="btn btn-block btn-info"
+                      onclick="window.location.href = '/restaurant/vendorList'">Show All</button><% } %>
+                  </div>
+                </div>
+                <table id="restaurantList" class="table table-bordered table-striped" style="width:100%">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Address</th>
+                      <th class="no-sort">Phone</th>
+                      <th class="no-sort">Logo & Banner</th>
+                      <th class="no-sort">CAC & Food Safety Certificate</th>
+                      <th class="no-sort">Status</th>
+                      <th>Created On</th>
+                      <th>Last Updated On</th>
+                      <th class="no-sort">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (vendors.length > 0){%>
+                    <%  for (let vendor of vendors){ %>
+                    <tr id="<%= vendor._id%>">
+                      <td><%= vendor.restaurantName %></td>
+                      <td><%= vendor.contactEmail %></td>
+                      <td><%= vendor.address %></td>
+                      <td><%= vendor.countryCode %><%= vendor.contactPhone %></td>
+                      <td style="text-align: center; vertical-align: middle;"><img
+                          src="<%= `${serverImagePath}${vendor.logo}` %>" height="100" width="100" alt="No Image"><br>
+                        <a href="<%= `${serverImagePath}${vendor.logo}` %>" target="_blank"><i
+                            style="color: green;cursor: pointer;" class="fa fa-eye" title="Click to View Full"
+                            aria-hidden="true"></i></a>
+                        <img src="<%= `${serverImagePath}${vendor.banner}` %>" height="100" width="100"
+                          alt="No Image"><br>
+                        <a href="<%= `${serverImagePath}${vendor.banner}` %>" target="_blank"><i
+                            style="color: green;cursor: pointer;" class="fa fa-eye" title="Click to View Full"
+                            aria-hidden="true"></i></a></td>
+
+                      <td style="text-align: center; vertical-align: middle;"><img
+                          src="<%= `${serverImagePath}${vendor.licenceImage}` %>" height="100" width="100"
+                          alt="No Image"><br>
+                        <a href="<%= `${serverImagePath}${vendor.licenceImage}` %>" target="_blank"><i
+                            style="color: green;cursor: pointer;" class="fa fa-eye" title="Click to View Full"
+                            aria-hidden="true"></i></a>
+                        <img src="<%= `${serverImagePath}${vendor.foodSafetyCertificate}` %>" height="100" width="100"
+                          alt="No Image"><br>
+                        <a href="<%= `${serverImagePath}${vendor.foodSafetyCertificate}` %>" target="_blank"><i
+                            style="color: green;cursor: pointer;" class="fa fa-eye" title="Click to View Full"
+                            aria-hidden="true"></i></a></td>
+
+                      <td class="vendorStatus"><% if (vendor.isActive == true){%>
+                        <button type="button" class="btn btn-block btn-success"
+                          onClick="javascript:changeVendorStatus('<%= vendor._id %>','Active');">Active</button>
+
+                          <a href="javascript:void(0)" onclick="javascript:viewNote('<%= vendor.activationNote %>');"><i
+                            style="color: green;cursor: pointer;" class="fa fa-comment" title="Click to View"
+                            aria-hidden="true"></i></a>
+                        <% }else { %>
+                        <button type="button" class="btn btn-block btn-danger"
+                          onClick="javascript:changeVendorStatus('<%= vendor._id %>','Inactive');">Inactive</button>
+                        <% } %>
+                      </td>
+
+                      <td>
+                        <span><%= moment(vendor.createdAt).format('YYYYMMDDhhmmss'); %></span><%= moment(vendor.createdAt).format('DD/MM/YYYY h:mm:ss a'); %>
+                      </td>
+                      <td>
+                        <span><%= moment(vendor.updatedAt).format('YYYYMMDDhhmmss'); %></span><%= moment(vendor.updatedAt).format('DD/MM/YYYY h:mm:ss a'); %>
+                      </td>
+
+                      <td>
+                        <i style="color: black;cursor: pointer;" class="fa fa-university" title="Bank Acount"
+                          aria-hidden="true" onClick="javascript:fetchBankAccount('<%= vendor._id %>');"></i> |
+
+                        <a href="/restaurant/edit?id=<%= vendor._id %>"><i style="color: green;cursor: pointer;"
+                            class="fa fa-edit" title="Edit Restaurant" aria-hidden="true"></i></a> |
+
+                        <a href="/restaurant/itemList?restaurant=<%= vendor._id %>"><i
+                            style="color: green;cursor: pointer;" class="fas fa-hamburger" title="Item List"
+                            aria-hidden="true"></i> </a> |
+
+                        <a href="/restaurant/sendPushMessage?restaurant=<%= vendor._id %>"><i
+                            style="color: black;cursor: pointer;" class="fa fa-bell" title="Send Push Message"
+                            aria-hidden="true"></i> </a> |
+
+                        <a href="/restaurant/vendorSetting?restaurant=<%= vendor._id %>"><i
+                            style="color: black;cursor: pointer;" class="fa fa-cog" title="Setting"
+                            aria-hidden="true"></i> </a> |
+
+                        <a href='/restaurant/disableRestaurant?restaurant=<%= vendor._id %>&type=disable'><i
+                            style="color: red;cursor: pointer;" class="fa fa-times" title="Disabled from Admin Panel"
+                            aria-hidden="true"></i></a> |
+
+                        <i style="color: blue;cursor: pointer;" class="fas fa-history" title="Log history"
+                          aria-hidden="true" onClick="javascript:getLogHistory('<%= vendor._id %>');"></i> |
+
+                        <a href="/review/reviewList?restaurant=<%= vendor._id %>">
+                          <i style="color: black;cursor: pointer;" class="fas fa-registered" title="Review List"
+                            aria-hidden="true"></i> </a> |
+
+                        <a href="/order/orderList?restaurant=<%= vendor._id %>"><i style="color: black;cursor: pointer;"
+                            class="fab fa-opera" title="Restaurant order" aria-hidden="true"></i></a>
+                      </td>
+                    </tr>
+                    <% } %>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <% include ../layout/footer %>
+
+  </div>
+
+  <div class="modal fade" id="modal-default">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Activation Note</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="noteText"></p>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+
+  <div class="modal fade" id="modal-overlay-bank">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="loader">
+          <div class="overlay d-flex justify-content-center align-items-center">
+            <i class="fas fa-2x fa-sync fa-spin"></i>
+          </div>
+        </div>
+        <div class="modal-header">
+          <h4 class="modal-title">Bank Acccount</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <h5>Account No: </h5>
+          <p class="accountNo"></p>
+          <h5>Business Name (Provided by Restaurant ): </h5>
+          <p class="businessName"></p>
+          <h5>Account Name (Provided by Paystack): </h5>
+          <p class="accountName"></p>
+          <h5>Commission (%): </h5>
+          <p class="commission"></p>
+          <h5>Status: </h5>
+          <p class="bankActive"> </p>
+          <a class="changeBankStatus"> </a>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+
+  <div class="modal fade" id="modal-xl">
+    <div class="modal-dialog  modal-xl">
+
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Restaurant Log History</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body log-content"></div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+        </div>
+
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+
+  <div class="modal fade" id="modal-overlay-staus">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="loader">
+          <div class="overlay d-flex justify-content-center align-items-center">
+            <i class="fas fa-2x fa-sync fa-spin"></i>
+          </div>
+        </div>
+        <div class="modal-header">
+          <h4 class="modal-title">Activation Range</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form role="form" id="activationForm" method="post" action="/restaurant/vendorActiveChange">
+          <div class="modal-body">
+            <div class="input-group mb-6">
+              <div class="form-group">
+                <label>Select Date & Time</label>
+
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="far fa-clock"></i></span>
+                  </div>
+                  <input type="text" class="form-control float-right" name="activeTime" id="reservationtime">
+                </div>
+
+                <div class="form-group">
+                  <label>Note</label>
+                  <textarea class="form-control" name="addNote" rows="3" placeholder="Enter Reason for Activation"></textarea>
+                </div>
+                <!-- /.input group -->
+              </div>
+            </div>
+          </div>
+          <input type="hidden" name="vendorIds" class="vendorId" id="vendorIds">
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save
+              changes</button>
+          </div>
+        </form>
+
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+
+  <!-- ./wrapper -->
+
+
+  <!-- jQuery -->
+  <script src="../../plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../js/bootstrap-notify.min.js"></script>
+
+
+  <!-- DataTables -->
+
+  <!-- <script src="../../plugins/datatables/jquery.dataTables.js"></script>
+  <script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
+  <script src="https://cdn.datatables.net/buttons/1.2.4/js/dataTables.buttons.min.js"></script> -->
+  <script type="text/javascript" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="//cdn.datatables.net/1.10.15/js/dataTables.bootstrap4.min.js"></script>
+  <script type="text/javascript" src="//cdn.datatables.net/buttons/1.3.1/js/dataTables.buttons.min.js"></script>
+  <script type="text/javascript" src="//cdn.datatables.net/buttons/1.3.1/js/buttons.bootstrap4.min.js"></script>
+  <script type="text/javascript"
+    src="https://cdn.datatables.net/fixedcolumns/3.3.2/js/dataTables.fixedColumns.min.js"></script>
+
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+  <script type="text/javascript" src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.27/build/pdfmake.min.js"></script>
+  <script type="text/javascript" src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.27/build/vfs_fonts.js"></script>
+  <!-- <script type="text/javascript" src="//cdn.datatables.net/buttons/1.3.1/js/buttons.html5.min.js"></script> -->
+
+  <script src="../../js/buttons.html5.js"></script>
+  <!-- jquery-validation -->
+  <script src="../../plugins/jquery-validation/jquery.validate.min.js"></script>
+  <script src="../../plugins/jquery-validation/additional-methods.min.js"></script>
+
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="../../js/adminlte.min.js"></script>
+  <!-- Toastr -->
+  <script src="../../plugins/toastr/toastr.min.js"></script>
+  <script src="https://momentjs.com/downloads/moment.min.js"></script>
+
+  <!-- date-range-picker -->
+  <script src="../../plugins/daterangepicker/daterangepicker.js"></script>
+
+  <script type="text/javascript">
+
+
+    $(function () {
+
+      $('#reservationtime').daterangepicker({
+        timePicker: false,
+        timePickerIncrement: 1,
+        locale: {
+          format: 'DD/MM/YYYY'
+        }
+      })
+
+      var table = $('#restaurantList').removeAttr('width').DataTable({
+        fixedHeader: true,
+        scrollY: "400px",
+        scrollX: true,
+        scrollCollapse: true,
+        paging: false,
+        ordering: true,
+        columnDefs: [{
+          orderable: false,
+          targets: "no-sort",
+          width: 40, targets: 0
+        }],
+        //fixedColumns: true,
+        "order": [[7, "desc"]],
+        // lengthChange: false,
+
+        dom: 'Bfrtip',
+        buttons: [
+          {
+            extend: 'excelHtml5',
+            text: 'Export to Excel',
+            title: `Restaurant-${moment().format('DD/MM/YYYYh:mm:ssa')}`,
+            message: `Restaurant List (Export on ${moment().format('DD/MM/YYYY h:mm:ss a')})`,
+            exportOptions: {
+              columns: [0, 1, 2, 3, 7, 8]
+            },
+            className: 'excel-db'
+
+
+          },
+          // {
+          //   extend: 'csvHtml5',
+          //   title: `Restaurant-${moment().format('DD/MM/YYYYh:mm:ssa')}`,
+          //   customize: function (csv) {
+          //     return `Restaurant List (Export on ${moment().format('DD/MM/YYYY h:mm:ss a')})` + csv;
+          //   },
+          //   exportOptions: {
+          //     columns: [0, 1, 2, 4]
+          //   }
+          // }
+        ]
+      });
+
+      table.buttons(0, null).containers().appendTo($('.ex-btn'));
+
+      $('.myInputTextField').keyup(function () {
+        table.search($(this).val()).draw();
+
+
+
+      })
+
+
+      $(".validityFrom").datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        showOtherMonths: true,
+        selectOtherMonths: true,
+        autoclose: true,
+        changeMonth: true,
+        changeYear: true,
+        orientation: "bottom left"
+      }).on('changeDate', function (selected) {
+        var startDate = new Date(selected.date.valueOf());
+        $('.validityTo').datepicker('setStartDate', startDate);
+      }).on('clearDate', function (selected) {
+        $('.validityTo').datepicker('setStartDate', null);
+      });
+
+      $(".validityTo").datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        showOtherMonths: true,
+        selectOtherMonths: true,
+        autoclose: true,
+        changeMonth: true,
+        changeYear: true,
+        orientation: "bottom left"
+      }).on('changeDate', function (selected) {
+        var endDate = new Date(selected.date.valueOf());
+        $('.validityFrom').datepicker('setEndDate', endDate);
+      }).on('clearDate', function (selected) {
+        $('.validityFrom').datepicker('setEndDate', null);
+      });
+
+    });
+
+    function viewNote(note) {
+      $("#modal-default").modal('show');
+      if(note == '') {
+        note = 'No Note found'
+      }
+      $(".noteText").html(note)
+    }
+
+    function activeStatus() {
+      $("#activationForm").submit();
+    }
+
+    function getLogHistory(vendorId) {
+
+      $("#modal-xl").modal('show');
+
+      $.ajax({
+        url: "/restaurant/getLogHistory",
+        type: "POST",
+        data: { vendorId: vendorId },
+        success: function (data, textStatus, jqXHR) {
+
+          $(".log-content").html(data);
+
+          $(".loader").hide();
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          toastr.error(data.msg)
+        }
+      });
+
+    }
+
+    function fetchBankAccount(vendorId) {
+
+      $("#modal-overlay-bank").modal('show');
+
+      $.ajax({
+        url: "/restaurant/fetchBankAccount",
+        type: "POST",
+        data: { vendorId: vendorId },
+        success: function (data, textStatus, jqXHR) {
+          //data - response from server
+          var reqBody = data.body;
+          if (reqBody == null) {
+            $(".accountNo").text('NA');
+            $(".businessName").text('NA');
+            $(".accountName").text('NA');
+            $(".bankActive").text('Inactive');
+            $(".commission").text('NA');
+            $(".changeBankStatus").html('');
+
+
+
+          } else {
+            $(".accountNo").text(reqBody.accountNo);
+            $(".businessName").text(reqBody.businessName);
+            $(".accountName").text(reqBody.accountName);
+            if (reqBody.vendorPayment == null) {
+              $(".commission").text('--');
+            } else {
+              $(".commission").text(reqBody.vendorPayment.paymentPercentage);
+            }
+
+
+            if (reqBody.isActive == true) {
+              $(".bankActive").text('Active');
+              // $(".changeBankStatus").html(`<a href='javascript:void(0)' onClick="javascript:changeBankStatus('${reqBody._id}')"> Click to change status</a>`);
+            } else {
+              $(".bankActive").html('Inactive');
+              // $(".changeBankStatus").html(`<a href='javascript:void(0)' onClick="javascript:changeBankStatus('${reqBody._id}')"> Click to change status</a>`);
+            }
+          }
+          $(".loader").hide();
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          toastr.error(data.msg)
+        }
+      });
+
+    }
+
+    function changeBankStatus(accountId) {
+      $(".loader").show();
+
+      $.ajax({
+        url: "/restaurant/updateBankStatus",
+        type: "POST",
+        data: { accountId: accountId },
+        success: function (data, textStatus, jqXHR) {
+          //data - response from server
+          var reqBody = data.body;
+          if (reqBody.isActive == true) {
+            $(".bankActive").html('Active');
+            $(".businessName").html(reqBody.businessName);
+            $(".changeBankStatus").html(`<a href='javascript:void(0)' onClick="javascript:changeBankStatus('${accountId}')"> Click to change status</a>`);
+          } else {
+            $(".bankActive").html('Inactive');
+            $(".changeBankStatus").html(`<a href='javascript:void(0)' onClick="javascript:changeBankStatus('${accountId}')"> Click to change status</a>`);
+          }
+          $(".loader").hide();
+          toastr.success(data.msg)
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          toastr.error(data.msg)
+        }
+      });
+
+    }
+
+
+    function filterRestaurant() {
+      var chngRes = $('#chngRes').val();
+
+      if (chngRes == 'duration') {
+
+        $(".filtr-duration").show();
+
+      } else {
+        window.location.replace(`/restaurant/vendorList?filter=${chngRes}`);
+      }
+
+
+
+
+
+      //alert(chngRes);
+    }
+
+
+    function changeVendorStatus(vendorId, status) {
+      if (status == 'Active') {
+        window.location.replace(`/restaurant/changeStatus?id=${vendorId}&status=${status}`);
+
+      } else {
+        $(".loader").hide();
+        $("#modal-overlay-staus").modal('show');
+
+        $("#vendorIds").val(vendorId);
+
+      }
+    }
+
+
+    function filterValidity() {
+      var fromDate = $(".validityFromS").val();
+      var toDate = $(".validityToS").val();
+
+      if (fromDate == '') {
+        toastr.error('From date connot be blank.')
+      } else if (toDate == '') {
+        toastr.error('To date connot be blank.')
+      } else {
+        window.location.replace(`/restaurant/vendorList?filter=duration&from=${fromDate}&to=${toDate}`);
+      }
+    }
+
+  </script>
+  <% if(messages.msgLog){ %>
+  <script>
+    $(function () {
+      $.notify({
+        // options
+        message: '<%= messages.msgLog %>'
+      }, {
+        // settings
+        type: '<%= messages.msgType %>',
+        spacing: 10,
+        z_index: 1035,
+        animate: {
+          enter: 'animated fadeInDown',
+          exit: 'animated fadeOutUp'
+        }
+      });
+    });
+  </script>
+  <% } %>
+
+</body>

@@ -1,0 +1,652 @@
+<% layout('layout/afterlogin') -%>
+
+<body class="hold-transition sidebar-mini">
+  <div class="wrapper">
+
+
+    <!-- Navbar -->
+    <% include ../layout/navbar %>
+
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <% include ../layout/sidebar %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>Item Add</h1>
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+
+      <!-- Main content -->
+      <section class="content">
+        <form role="form" id="editMenu" method="post" action="/restaurant/itemAddPost" enctype="multipart/form-data">
+          <div class="row">
+
+            <div class="col-md-6">
+              <div class="card card-primary">
+                <div class="card-body">
+                  <div class="form-group">
+                    <label for="menuName">Menu Name</label>
+                    <input type="text" id="menuName" class="form-control" name="menuName">
+                  </div>
+                  <div class="form-group">
+                    <label for="menuPrice">Menu Price (NGN)</label>
+                    <input type="text" id="menuPrice" class="form-control" name="menuPrice">
+                  </div>
+                  <div class="form-group">
+                    <label for="preparationTime">Estimated Preparation Time (Day-Hour-Min)</label>
+                    <div class="row">
+                      <input type="number" class="form-control col-4" name="preparationDay"
+                        placeholder="Preparation Day">
+                      <input type="number" class="form-control col-4" name="preparationHour"
+                        placeholder="Preparation Hour">
+                      <input type="number" class="form-control col-4" name="preparationMin"
+                        placeholder="Preparation Min" value="00">
+                    </div>
+                  </div>
+
+                  <div class=" form-group">
+                    <label>Menu Category</label>
+                    <select class="menuCategory" data-placeholder="Select Menu Category" style="width: 100%;"
+                      name="menuCategory">
+                      <% if (categoryArr.length > 0){
+                      for (let category of categoryArr){ %>
+
+                      <option value="<%= category._id %>"><%= category.categoryName %>
+                      </option>
+                      <% } } %>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="menuImage">Menu Image</label>
+                    <input type="file" id="menuImage" class="form-control" name="menuImage">
+                  </div>
+                  <div class=" form-group">
+                    <label>Choose Menu Discount</label>
+                    <select class="discountType" data-placeholder="Select Discount type" style="width: 100%;"
+                      name="discountType" onChange="javascript:changeDiscountType();">
+                      <% if (menuDiscountTypeArr.length > 0){
+                      for (let menuDiscountType of menuDiscountTypeArr){ %>
+                      <option value="<%= menuDiscountType.type %>"><%= menuDiscountType.name %>
+                      </option>
+                      <% } } %>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="discountAmount">Enter Discount</label>
+                    <input type="text" id="discountAmount" class="form-control discountAmount" name="discountAmount">
+                  </div>
+                  <div class="form-group">
+                    <label>Valid From</label>
+
+                    <div class="input-group date validityFrom" data-provide="datepicker">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">
+                          <i class="far fa-calendar-alt"></i>
+                        </span>
+                      </div>
+                      <input type="text" class="form-control validityFromS" name="validityFrom">
+                      <div class="input-group-addon">
+                        <span class="glyphicon glyphicon-th">
+
+                        </span>
+                      </div>
+                    </div>
+
+                  </div>
+                  <input type="hidden" name="vendorId" value="<%= vendorId%>">
+
+                  <div class="form-group">
+                    <label>Valid To</label>
+
+                    <div class="input-group date validityTo" data-provide="datepicker">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">
+                          <i class="far fa-calendar-alt"></i>
+                        </span>
+                      </div>
+                      <input type="text" class="form-control validityTos" name="validityTo">
+                      <div class="input-group-addon">
+                        <span class="glyphicon glyphicon-th">
+
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- /.card-body -->
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+
+              <!-- /.card -->
+              <div class="card card-info">
+                <div class="card-body">
+                  <label>Menu Options</label>
+                  <div class="row">
+                    <div class="col-10">
+                      <div class="form-group">
+                        <input type="text" id="optionType" class="form-control optionType" name="optionType"
+                          placeholder="Enter Option Heading">
+                      </div>
+                    </div>
+                    <div class="col-2">
+                      <button type="button" class="btn btn-success float-right" id="addOptionType">Add</button>
+                    </div>
+                  </div>
+                  <div id="optionTypeList"></div>
+
+                  <div class="row justify-content-center">
+                    <!-- <button type="submit" class="btn btn-success mt-3 w-50">Submit</button> -->
+                    <a class="btn btn-success mt-3 w-50 hidDone" hidden onclick="optionMenu()">Done</a>
+                  </div>
+                </div>
+                <!-- /.card-body -->
+              </div>
+              <!-- /.card -->
+              <div class="card card-info">
+                <div class="card-body">
+                  <label>Menu Extra</label>
+                  <div id="extraItem">
+
+                  </div>
+                  <div class="row">
+                    <div class="col-6 d-flex justify-content-end">
+                      <button type="button" class="btn btn-outline-success w-100" id="addExtraMenuItem">Add
+                        Item</button>
+                    </div>
+                    <div class="col-6 d-flex justify-content-start">
+                      <a class="btn btn-outline-success w-100 optionExtra" hidden onclick="optionExtra()">Done</a>
+                    </div>
+                  </div>
+                </div>
+                <!-- /.card-body -->
+              </div>
+              <input type="hidden" name="extraIndx" value="">
+              <input type="hidden" name="opIndx" value="">
+
+              <!-- /.card -->
+              <div class="col-12">
+                <button type="submit" class="btn btn-success float-right">Add Menu</button>
+              </div>
+
+            </div>
+
+
+        </form>
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <% include ../layout/footer %>
+
+  </div>
+  <!-- ./wrapper -->
+
+
+  <!-- jQuery -->
+  <script src="../../plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <!-- Select2 -->
+  <script src="../../plugins/select2/js/select2.full.min.js"></script>
+  <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../js/bootstrap-notify.min.js"></script>
+  <!-- Bootstrap Switch -->
+  <script src="../../plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+
+  <script src="../../plugins/inputmask/min/jquery.inputmask.bundle.min.js"></script>
+  <!-- jquery-validation -->
+  <script src="../../plugins/jquery-validation/jquery.validate.min.js"></script>
+  <script src="../../plugins/jquery-validation/additional-methods.min.js"></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="../../js/adminlte.min.js"></script>
+  <!-- Toastr -->
+  <script src="../../plugins/toastr/toastr.min.js"></script>
+
+  <script type="text/javascript">
+
+
+
+    $(function () {
+
+      $("input[data-bootstrap-switch]").each(function () {
+        $(this).bootstrapSwitch('state', $(this).prop('checked'));
+      });
+
+      $('[data-mask]').inputmask()
+
+
+      $(".validityFrom").datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        showOtherMonths: true,
+        selectOtherMonths: true,
+        autoclose: true,
+        changeMonth: true,
+        changeYear: true,
+        orientation: "bottom left"
+      }).on('changeDate', function (selected) {
+        var startDate = new Date(selected.date.valueOf());
+        $('.validityTo').datepicker('setStartDate', startDate);
+      }).on('clearDate', function (selected) {
+        $('.validityTo').datepicker('setStartDate', null);
+      });
+
+      $(".validityTo").datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        showOtherMonths: true,
+        selectOtherMonths: true,
+        autoclose: true,
+        changeMonth: true,
+        changeYear: true,
+        orientation: "bottom left"
+      }).on('changeDate', function (selected) {
+        var endDate = new Date(selected.date.valueOf());
+        $('.validityFrom').datepicker('setEndDate', endDate);
+      }).on('clearDate', function (selected) {
+        $('.validityFrom').datepicker('setEndDate', null);
+      });
+
+
+
+      //Initialize Select2 Elements
+      $('.discountType').select2()
+
+      $('.menuCategory').select2()
+      $('.restaurantType').select2()
+
+
+      // Initialize form validation on the registration form.
+      // It has the name attribute "registration"
+      $("#editMenu").validate({
+        // Specify validation rules
+        rules: {
+          menuName: {
+            required: true
+          },
+          menuPrice: {
+            required: true
+          },
+          preparationMin: {
+            required: true
+          },
+          menuCategory: {
+            required: true
+          },
+          menuImage: {
+            required: true,
+            extension: "jpg|jpeg|png|ico|bmp"
+          }
+        },
+        // Specify validation error messages
+        messages: {
+          menuName: {
+            required: 'Please enter menu name'
+          },
+          menuPrice: {
+            required: 'Please enter menu price'
+          },
+          preparationMin: {
+            required: 'Please enter waiting time in minutes'
+          },
+          menuCategory: {
+            required: 'Please select menu  category'
+          },
+          menuImage: {
+            extension: "Please upload file in these format only (jpg, jpeg, png, ico, bmp)."
+          }
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+          $(".hidDone").click();
+          $(".optionExtra").click();
+
+          error.addClass('invalid-feedback');
+          element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+          $(".hidDone").click();
+          $(".optionExtra").click();
+          $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+          $(".hidDone").click();
+          $(".optionExtra").click();
+          $(element).removeClass('is-invalid');
+        },
+        // Make sure the form is submitted to the destination defined
+        // in the "action" attribute of the form when valid
+        submitHandler: function (form) {
+
+          $(".hidDone").click();
+          $(".optionExtra").click();
+          form.submit();
+        }
+      });
+
+    });
+
+    var data = [];
+    var optionItems = [];
+    var extraItems = [];
+
+
+    // $.each(data, function (i, item) {
+    //   appendToOptionType(item);
+    // });
+    // $.each(optionItems, function (i, item) {
+    //   appendToOptionItems(item);
+    // });
+    // $.each(extraItems, function (i, item) {
+    //   appendToExtraItems(item);
+    // });
+    $('#addOptionType').click(() => {
+      var optionTypetxt = $('.optionType').val().trim();
+
+      if (optionTypetxt == '') {
+        toastr.error('Menu Options cannot be blank');
+      } else {
+        var optionType = {
+          id: data.length,
+          optionType: $('.optionType').val().trim()
+        };
+
+        console.log('optionType', optionType);
+        data.push(optionType);
+        appendToOptionType(optionType);
+        console.log('data', data);
+        $('.optionType').val('');
+      }
+
+    })
+    function appendToOptionType(item) {
+      $("#optionTypeList").append(`
+      <input type="hidden" name="optionTitle[]" id="${item.id}" value="${item.optionType}">
+      <div id="optionListItem_${item.id}">
+        <div
+        style="background-color: #e0e0e0;"
+        class="row align-items-center px-3 py-2 rounded my-3">
+          <div class="col-8">
+            <h5 class="font-weight-bold mb-0">${item.optionType}</h5>
+          </div>
+          <div class="col-3">
+            <button type="button" class="btn btn-outline-success"
+            onClick="addOptionItem(${item.id})">Add Item</button>
+          </div>
+          <div class="col-1">
+            <h5 class="text-danger mb-0 text-right"><i class="far fa-trash-alt"
+              onClick="deleteData(${item.id})"></i></h5>
+          </div>
+        </div>
+        <div id="optionItemList_${item.id}"></div>
+      </div>
+        `);
+    }
+    function addOptionItem(id) {
+      var optionItem = {
+        id: optionItems.length,
+      };
+      optionItems.push(optionItem);
+      console.log('optionItems', optionItems);
+      appendToOptionItems(id, optionItem);
+    }
+    function appendToOptionItems(id, item) {
+      $(`#optionItemList_${id}`).append(`
+      <div class="row align-items-center py-3 optionForm" id="optionItem_${item.id}">
+          <div class="col-1">
+            <div class="form-check d-flex align-items-center">
+              <input class="form-check-input" type="checkbox" name="optionBool[${id}][]" value="" id="optionBool_${item.id}">
+            </div>
+          </div>
+          <div class="col-9">
+            <div class="form-group mb-0">
+              <input type="text" id="optiontxtItem_${item.id}"
+              class="form-control optionText" name="optionTxt[${id}][]"
+              placeholder="Option Item">
+            </div>
+          </div>
+          <div class="col-1">
+            <div class="dropdown dropleft">
+              <div id="dropdownMenuButton_${item.id}" onClick="addDropdownValueOp(${item.id})" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <h4 class="text-muted mb-0"><i class="fas fa-chevron-circle-down"></i></h4>
+              </div>
+              <div class="dropdown-menu dropdown-menuOp" aria-labelledby="dropdownMenuButton_${item.id}">
+              </div>
+            </div>
+          </div>
+          <div class="col-1">
+            <h5 class="text-danger mb-0 text-right"><i class="far fa-trash-alt"
+              onClick="deleteOptionItems(${item.id})"></i></h5>
+          </div>
+        </div>
+        `);
+    }
+
+    $("#addExtraMenuItem").click(() => {
+      var extraItem = {
+        id: extraItems.length,
+      };
+      extraItems.push(extraItem);
+      console.log('extraItem', extraItem);
+      appendToExtraItems(extraItem);
+    })
+    function appendToExtraItems(item) {
+
+      $("#extraItem").append(`
+      <div class="row align-items-center py-3 extraForm" id="extraItem_${item.id}">
+        <div class="col-1">
+          <div class="form-check d-flex align-items-center">
+            <input class="form-check-input" type="checkbox" value="" name="extraBool[]">
+          </div>
+        </div>
+        <div class="col-5">
+          <div class="form-group mb-0">
+            <input type="text"
+            class="form-control extraName" name="extraName[]"
+            placeholder="Name">
+          </div>
+        </div>
+        <div class="col-1">
+          <div class="dropdown">
+            <div id="dropdownMenuButton_${item.id}" onClick="addDropdownValueEx(${item.id})" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <h4 class="text-muted mb-0"><i class="fas fa-chevron-circle-down"></i></h4>
+            </div>
+            <div class="dropdown-menu dropdown-menuEx" aria-labelledby="dropdownMenuButton_${item.id}">
+              
+              
+            </div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="form-group mb-0">
+            <input type="text"
+            class="form-control" name="extraPrice[]"
+            placeholder="Price">
+          </div>
+        </div>
+        <div class="col-1">
+          <h5 class="text-danger mb-0 text-right"><i class="far fa-trash-alt"
+            onClick="deleteExtraItems(${item.id})"></i></h5>
+        </div>
+      </div>
+        `);
+    }
+
+    function addDropdownValueEx(id) {
+
+      var jsonStrExtra = '<%- JSON.stringify(allExtra) %>';
+      var jsonStrExtraP = JSON.parse(jsonStrExtra);
+
+      var extraCont = ``;
+      if (jsonStrExtraP.length > 0) {
+        for (let extr of jsonStrExtraP) {
+          extraCont += `<div class="dropdown-item dropdown-ex">${extr.itemName}</div>`
+
+        }
+      }
+
+      $(".dropdown-menuEx").html(extraCont);
+    }
+
+
+    function addDropdownValueOp(id) {
+
+      var jsonStrOption = '<%- JSON.stringify(allOption) %>';
+      var jsonStrOptionP = JSON.parse(jsonStrOption);
+
+      var optCont = ``;
+      if (jsonStrOptionP.length > 0) {
+        for (let opt of jsonStrOptionP) {
+          optCont += `<div class="dropdown-item dropdown-op">${opt.name}</div>`
+
+        }
+      }
+
+      $(".dropdown-menuOp").html(optCont);
+
+    }
+
+    function deleteData(id) {
+      data.forEach(function (item, i) {
+        data.splice(i, 1);
+        $('#optionListItem_' + id).remove();
+      });
+    }
+    function deleteOptionItems(id) {
+      optionItems.forEach(function (item, i) {
+        $('#optionItem_' + id).remove();
+      });
+    }
+    function deleteExtraItems(id) {
+
+      extraItems.forEach(function (item, i) {
+        $('#extraItem_' + id).remove();
+      });
+    }
+
+    function optionMenu() {
+      var menuop = [];
+
+      var inputoptionTitle = document.getElementsByName('optionTitle[]');
+
+
+      for (var i = 0; i < inputoptionTitle.length; i++) {
+        var arrOptions = {
+          optionTitle: inputoptionTitle[i].value,
+          isActive: true
+        };
+        var arrOptionsArr = [];
+        console.log(inputoptionTitle[i].value);
+
+        var inputoptionTxt = document.getElementsByName(`optionTxt[${inputoptionTitle[i].id}][]`);
+        var inputoptionchecked = document.getElementsByName(`optionBool[${inputoptionTitle[i].id}][]`);
+
+
+        for (var j = 0; j < inputoptionTxt.length; j++) {
+          var childObj = {};
+
+          childObj.name = inputoptionTxt[j].value;
+          childObj.isActive = inputoptionchecked[j].checked;
+
+          arrOptionsArr.push(childObj);
+
+          console.log('inputoptionTxt', inputoptionTxt[j].value);
+          console.log('inputoptionTxt', inputoptionchecked[j].checked);
+        }
+
+        arrOptions.arrOptions = arrOptionsArr;
+
+
+        menuop.push(arrOptions);
+      }
+
+      console.log('menuop', menuop);
+
+      var json_arrOp = JSON.stringify(menuop);
+      $('input[name="opIndx"]').val(json_arrOp);
+    }
+
+    function optionExtra() {
+      var extrArr = [];
+
+      var inputPrice = document.getElementsByName('extraPrice[]');
+      var inputBool = document.getElementsByName('extraBool[]');
+      var inputName = document.getElementsByName('extraName[]');
+
+
+      for (var i = 0; i < inputPrice.length; i++) {
+        var extraItem = {}
+        extraItem.name = inputName[i].value;
+        extraItem.price = inputPrice[i].value;
+        extraItem.isActive = inputBool[i].checked;
+
+        extrArr.push(extraItem)
+      }
+
+      var json_arr = JSON.stringify(extrArr);
+      $('input[name="extraIndx"]').val(json_arr);
+
+    }
+
+    $("body").on('click', '.dropdown-ex', function () {
+
+      var drpTxt = $(this).text();
+
+      $(this).closest(".extraForm").find('.extraName').val(drpTxt);
+
+    });
+
+    $("body").on('click', '.dropdown-op', function () {
+
+      var drpOpTxt = $(this).text();
+
+      $(this).closest(".optionForm").find('.optionText').val(drpOpTxt);
+
+    });
+
+    function changeDiscountType() {
+
+
+      $(".discountAmount").val('');
+      $(".validityFromS").val('');
+      $(".validityToS").val('');
+
+    }
+
+
+
+  </script>
+  <% if(messages.msgLog){ %>
+  <script>
+    $(function () {
+      $.notify({
+        // options
+        message: '<%= messages.msgLog %>'
+      }, {
+        // settings
+        type: '<%= messages.msgType %>',
+        z_index: 1035,
+        spacing: 10,
+        animate: {
+          enter: 'animated fadeInDown',
+          exit: 'animated fadeOutUp'
+        }
+      });
+    });
+  </script>
+  <% } %>
+
+</body>

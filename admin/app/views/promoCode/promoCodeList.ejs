@@ -1,0 +1,209 @@
+<% layout('layout/afterlogin') -%>
+
+<body class="hold-transition sidebar-mini ">
+  <div class="wrapper">
+
+    <!-- Navbar -->
+    <% include ../layout/navbar %>
+
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <% include ../layout/sidebar %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>Promo code List</h1>
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="row">
+          <div class="col-12">
+            <!-- /.card -->
+
+            <div class="card">
+              <!-- /.card-header -->
+              <div class="card-body">
+                <table id="restaurantList" class="table table-bordered table-striped" style="width:100%">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Promo Code</th>
+                      <th>Category</th>
+                      <th>Discount</th>
+                      <th>From Date</th>
+                      <th>To Date</th>
+                      <th>Min Cap- Max Cap (NGN)</th>
+                      <th>Total Budget (NGN)</th>
+                      <th>Available Budget (NGN)</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (dataArr.length > 0){
+                      var i = 1;%>
+                    <%  for (let data of dataArr){ %>
+                    <tr id="<%= `id_${data._id}` %>">
+                      <td><i class="fa fa-sort" aria-hidden="true"></i></td>
+                      <td><%= data.promoCode %></td>
+                      <td><%= data.promoCategory %></td>
+                      <td><%= data.discountType %> <%= data.discountAmount %></td>
+                      <td><%= data.fromDate %></td>
+                      <td><%= data.toDate %></td>
+                      <td><%= data.promoCodeAmountMinCap %> - <%= data.promoCodeAmountMaxCap %></td>
+                      <td><%= data.totalBudget %></td>
+                      <td> <% if(data.currentOrderTotal == '') {
+                        var currentOrderTotal = 0;
+                      } else {
+                        var currentOrderTotal = Number(data.currentOrderTotal);
+                      } 
+                      if(data.totalBudget == '') {
+                        var totalBudget = 0;
+                      } else {
+                        var totalBudget = Number(data.totalBudget);
+                      } %>
+                        <%= Number(totalBudget - currentOrderTotal) %>
+                      </td>
+                      <td>
+                        <a href="/promoCode/promoCodeEdit?id=<%= data._id %>"><i style="color: green;cursor: pointer;" class="fa fa-edit" title="Edit Promo Code"
+                          aria-hidden="true"></i></a> |
+                        <i style="color: red;cursor: pointer;" class="fa fa-trash" title="Delete Promo Code"
+                          aria-hidden="true" onClick="javascript:deleteItem('<%= data._id %>');"></i>
+                      </td>
+                    </tr>
+                    <% i++;
+                   } %>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <% include ../layout/footer %>
+
+  </div>
+  <!-- ./wrapper -->
+
+
+  <!-- jQuery -->
+  <script src="../../plugins/jquery/jquery.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../js/bootstrap-notify.min.js"></script>
+  <!-- DataTables -->
+  <script src="../../plugins/datatables/jquery.dataTables.js"></script>
+  <script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
+  <!-- jquery-validation -->
+  <script src="../../plugins/jquery-validation/jquery.validate.min.js"></script>
+  <script src="../../plugins/jquery-validation/additional-methods.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="../../js/adminlte.min.js"></script>
+  <!-- Toastr -->
+  <script src="../../plugins/toastr/toastr.min.js"></script>
+
+  <script type="text/javascript">
+
+    $(function () {
+
+
+      $("tbody").sortable({
+        axis: 'y',
+        stop: function (event, ui) {
+          var Order = $(this).sortable('serialize').toString();
+
+          console.log(Order);
+
+          // save this Order value to the database
+
+          $.ajax({
+            url: "/promoCode/updateSorting",
+            type: "POST",
+            data: Order,
+            success: function (data, textStatus, jqXHR) {
+              //data - response from server
+              var reqBody = data.body;
+
+              $(".loader").hide();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              toastr.error(data.msg)
+            }
+          });
+
+        }
+
+      });
+
+
+
+      var table = $('#restaurantList').removeAttr('width').DataTable({
+        fixedHeader: true,
+        scrollY: "400px",
+        scrollX: false,
+        scrollCollapse: false,
+        paging: false,
+        searching: true,
+        ordering: false,
+
+        // columnDefs: [
+        //     { width: 200, targets: 0 }
+        // ],
+        fixedColumns: true
+      });
+
+
+
+    });
+
+
+    function deleteItem(dataId) {
+      if (confirm("Do you want to delete this promo code?")) {
+        // your deletion code
+
+        window.location.replace(`/promoCode/deletePromoCode?id=${dataId}`);
+      }
+      return false;
+    }
+
+
+  </script>
+  <% if(messages.msgLog){ %>
+  <script>
+    $(function () {
+      $.notify({
+        // options
+        message: '<%= messages.msgLog %>'
+      }, {
+        // settings
+        type: '<%= messages.msgType %>',
+        spacing: 10,
+        z_index: 1035,
+        animate: {
+          enter: 'animated fadeInDown',
+          exit: 'animated fadeOutUp'
+        }
+      });
+    });
+  </script>
+  <% } %>
+
+</body>

@@ -1,0 +1,321 @@
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+  <!-- Brand Logo -->
+
+  <a href="/dashboard" class="brand-link">
+    <img src="../../img/EE.jpg" alt="EE" class="brand-image img-circle elevation-3" style="opacity: .8">
+    <span class="brand-text font-weight-light">Kabou</span>
+  </a>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <!-- Sidebar Menu -->
+
+
+    <nav class="mt-2">
+      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <li class="nav-item has-treeview user">
+          <a href="#" class="nav-link user">
+            <i class="nav-icon fas fa-user"></i>
+            <p>
+              Profile
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="/user/editProfile" class="nav-link editProfile">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Edit Profile</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/user/changePassword" class="nav-link changePassword">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Change Password</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/user/logout" class="nav-link logout">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Logout</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+        
+        <li class="nav-item">
+          <a href="/dashboard" class="nav-link dashboard">
+            <i class="nav-icon fas fa-tachometer-alt"></i>
+            <p>Dashboard</p>
+          </a>
+        </li>
+
+        <li class="nav-item has-treeview subAdmin">
+          <a href="#" class="nav-link subAdmin">
+            <i class="nav-icon fa fa-users"></i>
+            <p>
+              Sub Admin
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="/subAdmin/adminList" class="nav-link adminList">
+                <i class="far fa-circle nav-icon"></i>
+                <p>List</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/subAdmin/adminAdd" class="nav-link adminAdd">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Add</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li class="nav-item has-treeview vendorCategory">
+          <a href="#" class="nav-link vendorCategory">
+            <i class="nav-icon fas fa-utensils"></i>
+            <p>
+              Restaurant Category
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="/vendorCategory/categoryList" class="nav-link categoryList">
+                <i class="far fa-circle nav-icon"></i>
+                <p>List</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/vendorCategory/categoryAdd" class="nav-link categoryAdd">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Add</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li class="nav-item has-treeview itemCategory">
+          <a href="#" class="nav-link itemCategory">
+            <i class="nav-icon fas fa-hamburger"></i>
+            <p>
+              Menu Category
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="/itemCategory/itemCategoryList" class="nav-link itemCategoryList">
+                <i class="far fa-circle nav-icon"></i>
+                <p>List</p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="/itemCategory/itemCategoryAdd" class="nav-link itemCategoryAdd">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Add</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+        
+
+        <li class="nav-item has-treeview restaurant">
+          <a href="#" class="nav-link restaurant">
+            <i class="nav-icon fa fa-window-maximize"></i>
+            <p>
+              Restaurant
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+
+            <li class="nav-item">
+              <a href="/restaurant/vendorList" class="nav-link vendorList">
+                <i class="far fa-circle nav-icon"></i>
+                <p>List</p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="/restaurant/disableList" class="nav-link disableList">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Disabled List</p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="/restaurant/bankAccountList" class="nav-link bankAccountList">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Bank Account</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/restaurant/unapprovedItemList?restaurant=all&isApprove=false"
+                class="nav-link unapprovedItemList">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Item List</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/restaurant/sendPushMessage" class="nav-link sendPushMessage">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Send Push Message</p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="/restaurant/vendorNotificationList" class="nav-link vendorNotificationList">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Notification List</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/restaurant/vendorNotificationList?automatic=true" class="nav-link vendorNotificationList">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Auto Notification List</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+        
+        <li class="nav-item">
+          <a href="/payment/paymentList" class="nav-link payment">
+            <i class="nav-icon far fa-money-bill-alt"></i>
+            <p>Payment</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/order/orderList" class="nav-link orderList">
+            <i class="nav-icon fab fa-opera"></i>
+            <p>Order Management</p>
+          </a>
+        </li>
+        <li class="nav-item has-treeview customer">
+          <a href="#" class="nav-link customer">
+            <i class="nav-icon fa fa-window-maximize"></i>
+            <p>
+              Customer
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+
+            <li class="nav-item">
+              <a href="/customer/customerList" class="nav-link customerList">
+                <i class="far fa-circle nav-icon"></i>
+                <p>List</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/customer/customerSendPushMessage" class="nav-link customerSendPushMessage">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Send Push Message</p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a href="/customer/customerNotificationList" class="nav-link customerNotificationList">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Notification List</p>
+              </a>
+            </li>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item has-treeview content">
+          <a href="#" class="nav-link content">
+            <i class="nav-icon fa fa-crosshairs"></i>
+            <p>
+              Content
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="/content/contentList" class="nav-link contentList">
+                <i class="far fa-circle nav-icon"></i>
+                <p>CMS List</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/content/faqList" class="nav-link faqList">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Faq List</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/content/faqAdd" class="nav-link faqAdd">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Faq Add</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/content/autoNotificationList" class="nav-link autoNotificationList">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Auto Notification Manage</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item has-treeview offerBanner">
+          <a href="#" class="nav-link offerBanner">
+            <i class="nav-icon fas fa-images"></i>
+            <p>
+              Banner
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="/offerBanner/bannerList" class="nav-link bannerList">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Banner List</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/offerBanner/bannerAdd" class="nav-link bannerAdd">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Banner Add</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item has-treeview promoCode">
+          <a href="#" class="nav-link promoCode">
+            <i class="nav-icon fas fa-percent"></i>
+            <p>
+              Promo Code
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="/promoCode/promoCodeList" class="nav-link promoCodeList">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Promo Code List</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/promoCode/promoCodeAdd" class="nav-link promoCodeAdd">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Promo Code Add</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a href="/adminSetting/settingsEdit" class="nav-link adminSetting">
+            <i class="nav-icon fa fa-cog"></i>
+            <p>Distance Setting</p>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <!-- /.sidebar-menu -->
+  </div>
+  <!-- /.sidebar -->
+</aside>

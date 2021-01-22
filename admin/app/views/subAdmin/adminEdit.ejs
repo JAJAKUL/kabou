@@ -1,0 +1,275 @@
+<% layout('layout/afterlogin') -%>
+
+<body class="hold-transition sidebar-mini">
+  <div class="wrapper">
+
+
+    <!-- Navbar -->
+    <% include ../layout/navbar %>
+
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <% include ../layout/sidebar %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>Sub admin Edit</h1>
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+
+      <!-- Main content -->
+      <section class="content">
+        <form role="form" id="addSubadmin" method="post" action="/subAdmin/adminEditPost"
+              enctype="multipart/form-data">
+        <div class="row">
+          
+          <div class="col-md-6">
+            <div class="card card-primary">
+              <div class="card-body">
+                <div class="form-group">
+                  <label for="firstName">First Name</label>
+                  <input type="text" id="firstName" class="form-control" value="<%= subAdmin.firstName %>" name="firstName">
+                </div>
+                <div class="form-group">
+                  <label for="lastName">Last Name</label>
+                  <input type="text" id="lastName" class="form-control"
+                    value="<%= subAdmin.lastName %>" name="lastName">
+              </div>
+               
+                <div class="form-group">
+                  <label for="contactEmail">Login Email</label>
+                  <input type="text" id="contactEmail" class="form-control"
+                    value="<%= subAdmin.email %>" name="contactEmail">
+                </div>
+                <div class="form-group">
+                  <label for="contactPhone">Contact Number</label>
+                  <input type="text" id="contactPhone" class="form-control"
+                    value="<%= subAdmin.phone %>" name="contactPhone">
+                </div>
+
+                <div class="form-group">
+                  <label for="password">Password</label>
+                  <input type="text" id="password" class="form-control"
+                    value="" name="password" placeholder="Enter password to change">
+                </div>
+              </div>
+              <!-- /.card-body -->
+            </div>
+          </div>
+          <input type="hidden" name="adminId" value="<%= adminId %>">
+
+          <div class="col-md-6">
+            
+            <!-- /.card -->
+            <div class="card card-info">
+              <div class="card-body">
+                <div class=" form-group">
+                  <label>Manageable Module (Full Access)</label>
+                    <select class="restaurantType" multiple data-placeholder="Select Manageable module"
+                          style="width: 100%;" name="manageableModule">
+                    <%
+                    if (adminModules.length > 0){
+                      for (let admin of adminModules){ %>
+                        <% if(subAdmin.manageableModuleFullAccess.includes(admin.moduleSlug)) {
+                          var selectedOption = 'selected';
+                        } else {
+                          var selectedOption = '';
+                        }%>
+                    <option value="<%= admin.moduleSlug %>" <%= selectedOption %>><%= admin.moduleName %></option>
+                    <% } } %>
+                  </select>
+                </div>
+
+                <div class=" form-group">
+                  <label>Manageable Module (View Only Access)</label>
+                    <select class="restaurantType" multiple data-placeholder="Select Manageable module"
+                          style="width: 100%;" name="manageableModuleViewOnly">
+                    <%
+                    if (adminModules.length > 0){
+                      for (let admin of adminModules){ %>
+                        <% if(subAdmin.manageableModuleViewOnly.includes(admin.moduleSlug)) {
+                          var selectedOption = 'selected';
+                        } else {
+                          var selectedOption = '';
+                        }%>
+                    <option value="<%= admin.moduleSlug %>" <%= selectedOption %>><%= admin.moduleName %></option>
+                    <% } } %>
+                  </select>
+                </div>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+            <div class="col-12">
+              <button type="submit" class="btn btn-success float-right">Update Subadmin</button>
+            </div>
+
+          </div>
+          
+        </div>
+        </form>
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <% include ../layout/footer %>
+
+  </div>
+  <!-- ./wrapper -->
+
+
+  <!-- jQuery -->
+  <script src="../../plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <!-- Select2 -->
+  <script src="../../plugins/select2/js/select2.full.min.js"></script>
+  <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../js/bootstrap-notify.min.js"></script>
+
+  <script src="../../js/jquery.multiselect.js"></script>
+  <!-- Bootstrap Switch -->
+<script src="../../plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+  <!-- jquery-validation -->
+  <script src="../../plugins/jquery-validation/jquery.validate.min.js"></script>
+  <script src="../../plugins/jquery-validation/additional-methods.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="../../js/adminlte.min.js"></script>
+
+  <script type="text/javascript">
+
+
+
+    $(function () {
+
+      $("input[data-bootstrap-switch]").each(function(){
+      $(this).bootstrapSwitch('state', $(this).prop('checked'));
+    });
+
+
+      $('.timepicker-open').timepicker({
+        timeFormat: 'h:mm p',
+        interval: 30,
+        dynamic: true,
+        dropdown: true,
+        scrollbar: true
+      });
+
+      $('.timepicker-close').timepicker({
+        timeFormat: 'h:mm p',
+        interval: 30,
+        dynamic: true,
+        dropdown: true,
+        scrollbar: true
+      });
+
+      //Initialize Select2 Elements
+      // $('.restaurantType').select2()
+      // Initialize form validation on the registration form.
+      // It has the name attribute "registration"
+      $("#addSubadmin").validate({
+        // Specify validation rules
+        rules: {
+          firstName: {
+            required: true
+          },
+          lastName: {
+            required: true
+          },
+          contactEmail: {
+            required: true,
+            email: true
+          },
+          contactPhone: {
+            required: true,
+            number: true,
+            maxlength: 10,
+            minlength: 10
+          },
+          manageableModule: {
+            required: true
+          },
+          manageableModuleViewOnly: {
+            required: true
+          }
+        },
+        // Specify validation error messages
+        messages: {
+          firstName: {
+            required: 'Please enter first name'
+          },
+          lastName: {
+            required: 'Please enter last name'
+          },
+          contactEmail: {
+            required: 'Please enter contact email',
+            email: 'Please enter valid email'
+          },
+          contactPhone: {
+            required: 'Please enter contact phone',
+            number: 'Please enter valid phone no',
+            maxlength: 'Invalid phone no',
+            minlength: 'Phone number should be 10 digit'
+          },
+          manageableModule: {
+            required: 'Please select manageable module',
+          }
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+          error.addClass('invalid-feedback');
+          element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+          $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+          $(element).removeClass('is-invalid');
+        },
+        // Make sure the form is submitted to the destination defined
+        // in the "action" attribute of the form when valid
+        submitHandler: function (form) {
+          form.submit();
+        }
+      });
+    });
+
+    $('select[multiple]').multiselect({
+      columns  : 2,
+      search   : true,
+      selectAll: true,
+      texts    : {
+          placeholder: 'Select Restaurant',
+          search     : 'Search Restaurant'
+      }
+    });
+  </script>
+  <% if(messages.msgLog){ %>
+  <script>
+    $(function () {
+      $.notify({
+        // options
+        message: '<%= messages.msgLog %>'
+      }, {
+        // settings
+        type: '<%= messages.msgType %>',
+        z_index: 1035,
+        spacing: 10,
+        animate: {
+          enter: 'animated fadeInDown',
+          exit: 'animated fadeOutUp'
+        }
+      });
+    });
+  </script>
+  <% } %>
+
+</body>

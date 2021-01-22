@@ -1,0 +1,271 @@
+<% layout('layout/afterlogin') -%>
+
+<body class="hold-transition sidebar-mini">
+  <div class="wrapper">
+
+    <!-- Navbar -->
+    <% include ../layout/navbar %>
+
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <% include ../layout/sidebar %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>Promo code <small>add</small></h1>
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+
+      <section class="content">
+        <div class="container-fluid">
+          <!-- SELECT2 EXAMPLE -->
+          <div class="card card-default">
+            <!-- /.card-header -->
+            <form role="form" id="addOffer" method="post" action="/offerBanner/addOfferSubmit"
+              enctype="multipart/form-data">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Choose Banner</label>
+                      <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="customFile" name="banner">
+                        <label class="custom-file-label" for="customFile">Choose file</label>
+                      </div>
+                    </div>
+                    <!-- /.form-group -->
+                    <div class="form-group">
+                      <label>From Date</label>
+
+
+
+                      <div class="input-group date fromDate" data-provide="datepicker">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="far fa-calendar-alt"></i>
+                          </span>
+                        </div>
+                        <input type="text" class="form-control" name="fromDate">
+                        <div class="input-group-addon">
+                          <span class="glyphicon glyphicon-th">
+
+                          </span>
+                        </div>
+                      </div>
+
+                    </div>
+                    <!-- /.form-group -->
+                  </div>
+                  <!-- /.col -->
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Select Restaurant</label>
+                      <select class="select2" multiple="multiple" data-placeholder="Select Restaurant"
+                        style="width: 100%;" name="restaurant" id="chngRes">
+                        <% if (promoCodeTypeCondArr.length > 0){%>
+                        <%  for (let promoCodeType of promoCodeTypeCondArr){ %>
+                        <option value="<%= promoCodeType.type %>"><%= promoCodeType.restaurantName %></option>
+                        <% } } %>
+                      </select>
+                    </div>
+                    <!-- /.form-group -->
+                    <div class="form-group">
+                      <label>To Date</label>
+                      <div class="input-group date toDate" data-provide="datepicker">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i class="far fa-calendar-alt"></i>
+                          </span>
+                        </div>
+                        <input type="text" class="form-control" name="toDate">
+                        <div class="input-group-addon">
+                          <span class="glyphicon glyphicon-th">
+
+                          </span>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                  <!-- /.col -->
+                </div>
+                <!-- /.row -->
+
+              </div>
+              <div class="card-footer">
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+            </form>
+          </div>
+          <!--/.col (left) -->
+        </div>
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <% include ../layout/footer %>
+
+  </div>
+  <!-- ./wrapper -->
+
+
+  <!-- jQuery -->
+  <script src="../../plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <!-- Select2 -->
+  <script src="../../plugins/select2/js/select2.full.min.js"></script>
+  <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../js/bootstrap-notify.min.js"></script>
+
+  <!-- InputMask -->
+  <script src="../../plugins/moment/moment.min.js"></script>
+  <script src="../../plugins/inputmask/min/jquery.inputmask.bundle.min.js"></script>
+
+  <!-- bs-custom-file-input -->
+  <script src="../../plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+  <!-- jquery-validation -->
+  <script src="../../plugins/jquery-validation/jquery.validate.min.js"></script>
+  <script src="../../plugins/jquery-validation/additional-methods.min.js"></script>
+  <!-- date-range-picker -->
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="../../js/adminlte.min.js"></script>
+
+  <script type="text/javascript">
+    $(function () {
+
+      $(".fromDate").datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        showOtherMonths: true,
+        selectOtherMonths: true,
+        autoclose: true,
+        changeMonth: true,
+        changeYear: true,
+        orientation: "bottom left"
+      }).on('changeDate', function (selected) {
+        var startDate = new Date(selected.date.valueOf());
+        $('.toDate').datepicker('setStartDate', startDate);
+      }).on('clearDate', function (selected) {
+        $('.toDate').datepicker('setStartDate', null);
+      });
+
+      $(".toDate").datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        showOtherMonths: true,
+        selectOtherMonths: true,
+        autoclose: true,
+        changeMonth: true,
+        changeYear: true,
+        orientation: "bottom left"
+      }).on('changeDate', function (selected) {
+        var endDate = new Date(selected.date.valueOf());
+        $('.fromDate').datepicker('setEndDate', endDate);
+      }).on('clearDate', function (selected) {
+        $('.fromDate').datepicker('setEndDate', null);
+      });
+
+  
+
+      bsCustomFileInput.init();
+
+      //Initialize Select2 Elements
+      $('.select2').select2()
+      // Initialize form validation on the registration form.
+      // It has the name attribute "registration"
+      $("#addOffer").validate({
+        // Specify validation rules
+        rules: {
+          banner: {
+            required: true,
+            extension: "jpg|jpeg|png|ico|bmp"
+          },
+          fromDate: {
+            required: true
+          },
+          toDate: {
+            required: true
+          }
+        },
+        // Specify validation error messages
+        messages: {
+          banner: {
+            required: 'Please upload a banner',
+            extension: "Please upload file in these format only (jpg, jpeg, png, ico, bmp)."
+          },
+          fromDate: {
+            required: 'Please choose from date'
+          },
+          toDate: {
+            required: 'Please choose to date'
+          }
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+          error.addClass('invalid-feedback');
+          element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+          $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+          $(element).removeClass('is-invalid');
+        },
+        // Make sure the form is submitted to the destination defined
+        // in the "action" attribute of the form when valid
+        submitHandler: function (form) {
+          form.submit();
+        }
+      });
+    });
+    $("body").on("change", "#chngRes", function () {
+      var chngRes = $('#chngRes').val();
+
+      if (chngRes.includes("all")) {
+        $('#chngRes option').prop('selected', true);
+        $('#chngRes option[value="all"]').remove();
+
+        var deselectOption = $('<option value="deselect">Deselect All Restaurant</option>');
+        $('#chngRes').prepend(deselectOption);
+
+      } else if (chngRes.includes("deselect")) {
+        $('#chngRes option').prop('selected', false);
+        $('#chngRes option[value="deselect"]').remove();
+
+        var newOption = $('<option value="all">All Restaurant</option>');
+        $('#chngRes').prepend(newOption);
+
+      }
+    })
+  </script>
+  <% if(messages.msgLog){ %>
+  <script>
+    $(function () {
+      $.notify({
+        // options
+        message: '<%= messages.msgLog %>'
+      }, {
+        // settings
+        type: '<%= messages.msgType %>',
+        z_index: 1035,
+        spacing: 10,
+        animate: {
+          enter: 'animated fadeInDown',
+          exit: 'animated fadeOutUp'
+        }
+      });
+    });
+  </script>
+  <% } %>
+
+</body>

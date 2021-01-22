@@ -1,0 +1,202 @@
+<% layout('layout/afterlogin') -%>
+<style>
+  #restaurantList span {
+    display: none;
+  }
+
+  #restaurantList_filter {
+    display: none;
+  }
+</style>
+
+<body class="hold-transition sidebar-mini ">
+  <div class="wrapper">
+
+    <!-- Navbar -->
+    <% include ../layout/navbar %>
+
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <% include ../layout/sidebar %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>FAQ List</h1>
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="row">
+          <div class="col-12">
+            <!-- /.card -->
+
+            <div class="card">
+              <!-- /.card-header -->
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label>Select User Type</label>
+                      <select class="form-control select2" id="changeOrder" onchange="javascript:changeUserType();">
+                        <%
+                      var allSel = '';
+                      var newSel = '';
+
+                      if(userType == 'CUSTOMER') {
+                        allSel = 'selected'
+                      } 
+                      if(userType == 'VENDOR') {
+                        newSel = 'selected'
+                      }
+                       %>
+
+                        <option value="CUSTOMER" <%= allSel%>>Customer</option>
+                        <option value="VENDOR" <%= newSel%>>Restaurant</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-4 db-search">
+                    <div class="form-group">
+                      <label>Search</label>
+                      <input type="text" name="search" class="form-control myInputTextField" placeholder="Search">
+                    </div>
+
+                  </div>
+
+                </div>
+                <table id="restaurantList" class="table table-bordered table-striped" style="width:100%">
+                  <thead>
+                    <tr>
+    
+                      <th>Question</th>
+                      <th>Answer</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (faqs.length > 0){
+                     %>
+                    <%  for (let faq of faqs){ %>
+                    <tr>
+                      
+                      <td><%= faq.question %></td>
+                      <td><%= faq.answer[0] %></td>
+                      
+                      <td>
+                        <a href="/content/faqEdit?id=<%= faq._id %>"><i style="color: green;cursor: pointer;" class="fa fa-edit" title="Edit FAQ"
+                          aria-hidden="true"></i></a> |
+                        <i style="color: red;cursor: pointer;" class="fa fa-trash" title="Edit Category"
+                          aria-hidden="true" onClick="javascript:deleteItem('<%= faq._id %>');"></i>
+                      </td>
+                    </tr>
+                    <%
+                   } %>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <% include ../layout/footer %>
+
+  </div>
+  <!-- ./wrapper -->
+
+
+  <!-- jQuery -->
+  <script src="../../plugins/jquery/jquery.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../js/bootstrap-notify.min.js"></script>
+  <!-- DataTables -->
+  <script src="../../plugins/datatables/jquery.dataTables.js"></script>
+  <script src="../../plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
+  <!-- jquery-validation -->
+  <script src="../../plugins/jquery-validation/jquery.validate.min.js"></script>
+  <script src="../../plugins/jquery-validation/additional-methods.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="../../js/adminlte.min.js"></script>
+  <!-- Toastr -->
+  <script src="../../plugins/toastr/toastr.min.js"></script>
+
+  <script type="text/javascript">
+
+    $(function () {
+
+      var table = $('#restaurantList').removeAttr('width').DataTable({
+        fixedHeader: true,
+        scrollY: "400px",
+        scrollX: false,
+        scrollCollapse: false,
+        paging: false,
+        searching: true,
+        ordering: false,
+
+        // columnDefs: [
+        //     { width: 200, targets: 0 }
+        // ],
+        fixedColumns: true
+      });
+
+
+
+    });
+
+
+    function deleteItem(faqId) {
+      if (confirm("Do you want to delete this faq?")) {
+        // your deletion code
+
+        window.location.replace(`/content/deleteFaq?id=${faqId}`);
+      }
+      return false;
+    }
+
+    function changeUserType() {
+      var changeOrder = $('#changeOrder').val();
+
+      window.location.replace(`/content/faqList?userType=${changeOrder}`);
+    }
+
+
+  </script>
+  <% if(messages.msgLog){ %>
+  <script>
+    $(function () {
+      $.notify({
+        // options
+        message: '<%= messages.msgLog %>'
+      }, {
+        // settings
+        type: '<%= messages.msgType %>',
+        spacing: 10,
+        z_index: 1035,
+        animate: {
+          enter: 'animated fadeInDown',
+          exit: 'animated fadeOutUp'
+        }
+      });
+    });
+  </script>
+  <% } %>
+
+</body>

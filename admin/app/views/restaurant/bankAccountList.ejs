@@ -1,0 +1,472 @@
+<% layout('layout/afterlogin') -%>
+
+<body class="hold-transition sidebar-mini ">
+  <style>
+    #restaurantList span {
+      display: none;
+    }
+
+    #restaurantList_filter {
+      display: none;
+    }
+  </style>
+  <div class="wrapper">
+
+    <!-- Navbar -->
+    <% include ../layout/navbar %>
+
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <% include ../layout/sidebar %>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1>Restaurant Bank Account</h1>
+            </div>
+          </div>
+        </div><!-- /.container-fluid -->
+      </section>
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="row">
+          <div class="col-12">
+            <!-- /.card -->
+
+            <div class="card">
+              <!-- /.card-header -->
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label>Filter</label>
+                      <select class="form-control select2" id="chngRes" onchange="javascript:filterRestaurant();">
+                        <%
+                      var allSel = '';
+                      var activeSel = '';
+                      var inactiveSel = '';
+                      var nobankrecordedSel = '';
+                      var durationSel = '';
+                      if(vendorCondtxt == 'all') {
+                        allSel = 'selected'
+                      } 
+                      if(vendorCondtxt == 'active') {
+                        activeSel = 'selected'
+                      }
+                      if(vendorCondtxt == 'inactive') {
+                        inactiveSel = 'selected'
+                      }
+                      if(vendorCondtxt == 'nobankrecorded') {
+                        nobankrecordedSel = 'selected'
+                      }
+                      if(vendorCondtxt == 'duration') {
+                        durationSel = 'selected'
+                      }%>
+
+                        <option value="all" <%= allSel%>>All</option>
+                        <option value="active" <%= activeSel%>>Active</option>
+                        <option value="inactive" <%= inactiveSel%>>Inactive</option>
+                        <option value="nobankrecorded" <%= nobankrecordedSel%>>No Bank Recorded</option>
+                        <option value="duration" <%= durationSel%>>Duration</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-2 ex-btn" style="margin-top: 33px;">
+
+                  </div>
+                  <div class="col-md-4 db-search">
+                    <div class="form-group">
+                      <label>Search</label>
+                      <input type="text" name="search" class="form-control myInputTextField" placeholder="Search">
+                    </div>
+
+                  </div>
+                </div>
+                <table id="restaurantList" class="table table-bordered table-striped" style="width:100%">
+                  <thead>
+                    <tr>
+                      <th>Restaurant Name </th>
+                      <th>Bank Name</th>
+                      <th>Account Number</th>
+                      <th>Account Name (Provided by Restaurant)</th>
+                      <th>Account Name (Provided by Paystack)</th>
+                      <th>Commission (%)</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (vendorBankArr.length > 0){%>
+                    <%  for (let vendorBank of vendorBankArr){ %>
+                    <tr>
+                      <td><%= vendorBank.vendor.restaurantName %></td>
+
+                      <td>
+                        <% if(vendorBank.bankInfo != null) { %>
+                        <%= vendorBank.bankInfo.bankName %>
+                        <% } %>
+                      </td>
+                      <td><%= vendorBank.accountNo %></td>
+                      <td><%= vendorBank.businessName %></td>
+                      <td><%= vendorBank.accountName %></td>
+                      <td style="text-align: center; vertical-align: middle;">
+                        <% if (vendorBank.vendorPayment == null){%>
+                        --
+                        <% } else if(vendorBank.vendorPayment == 'null'){ %>
+                        <% } else { %>
+                        <%= vendorBank.vendorPayment.paymentPercentage %>%
+                        <% } %>
+
+                      </td>
+                      <td class="vendorStatus">
+                        <% if (vendorBank.isActive == true){ %>
+                        <button type="button" class="btn btn-block btn-success"
+                          onclick="window.location.href = '/restaurant/changeBankStatus?id=<%= vendorBank._id %>&status=Active'">Active</button>
+                        <% } else if(vendorBank.isActive == false) { %>
+                        <button type="button" class="btn btn-block btn-danger"
+                          onclick="window.location.href = '/restaurant/changeBankStatus?id=<%= vendorBank._id %>&status=Inactive'">Inactive</button>
+                        <% } else { %>
+                        <button type="button" disabled class="btn btn-block">Not Available</button>
+
+                        <% } %>
+                      </td>
+                      <td>
+                        <% if (vendorBank.isActive != 'null'){ %>
+
+                        <% if (vendorBank.vendorPayment == null){%>
+
+                        <i style="color: green;cursor: pointer;" class="fa fa-edit" title="Edit Commission"
+                          aria-hidden="true"
+                          onClick="javascript:updateCommission('<%= vendorBank.vendor._id %>','--');"></i>
+
+                          | <i style="color: blue;cursor: pointer;" class="fas fa-history" title="Log history"
+                          aria-hidden="true" onClick="javascript:getBankHistory('<%= vendorBank.vendor._id %>');"></i>
+                        <% } else if(vendorBank.vendorPayment == 'null'){ %>
+
+                        <% } else { %>
+
+                        <i style="color: green;cursor: pointer;" class="fa fa-edit" title="Edit Commission"
+                          aria-hidden="true"
+                          onClick="javascript:updateCommission('<%= vendorBank.vendor._id %>','<%= vendorBank.vendorPayment.paymentPercentage %>');"></i>
+
+                        | <i style="color: blue;cursor: pointer;" class="fas fa-history" title="Log history"
+                          aria-hidden="true" onClick="javascript:getBankHistory('<%= vendorBank.vendor._id %>');"></i>
+                        <% } %>
+
+                        | <i style="color: red;cursor: pointer;" class="fa fa-trash" title="Delete Bank Account"
+                          aria-hidden="true" onClick="javascript:deleteBank('<%= vendorBank._id %>');"></i>
+
+
+                        <% } %>
+                      </td>
+                    </tr>
+                    <% } %>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </section>
+      <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <% include ../layout/footer %>
+
+  </div>
+  <div class="modal fade" id="modal-overlay-bank">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="loader">
+          <div class="overlay d-flex justify-content-center align-items-center">
+            <i class="fas fa-2x fa-sync fa-spin"></i>
+          </div>
+        </div>
+        <div class="modal-header">
+          <h4 class="modal-title">Payment Commission</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form role="form" id="updateCommission" method="post">
+          <div class="modal-body">
+            <div class="input-group mb-3">
+              <label for="inputClientCompany" style="margin-right: 5px;">Commission</label>
+              <input type="number" id="inputClientCompany" class="form-control commission col-3" name="commission">
+              <div class="input-group-append">
+                <span class="input-group-text"><i class="fas fa-percentage"></i></span>
+              </div>
+            </div>
+          </div>
+          <input type="hidden" name="vendorId" class="vendorId">
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="javascript:updateCommissionPercentage()">Save
+              changes</button>
+          </div>
+        </form>
+
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+
+  <div class="modal fade" id="modal-xl">
+    <div class="modal-dialog  modal-xl">
+
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Restaurant Bank Account History</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body log-content"></div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+        </div>
+
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- ./wrapper -->
+
+
+  <!-- jQuery -->
+  <script src="../../plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../js/bootstrap-notify.min.js"></script>
+  <!-- DataTables -->
+  <script type="text/javascript" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="//cdn.datatables.net/1.10.15/js/dataTables.bootstrap4.min.js"></script>
+  <script type="text/javascript" src="//cdn.datatables.net/buttons/1.3.1/js/dataTables.buttons.min.js"></script>
+  <script type="text/javascript" src="//cdn.datatables.net/buttons/1.3.1/js/buttons.bootstrap4.min.js"></script>
+
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+  <script type="text/javascript" src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.27/build/pdfmake.min.js"></script>
+  <script type="text/javascript" src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.27/build/vfs_fonts.js"></script>
+  <script src="../../js/buttons.html5.js"></script>
+  <!-- jquery-validation -->
+  <script src="../../plugins/jquery-validation/jquery.validate.min.js"></script>
+  <script src="../../plugins/jquery-validation/additional-methods.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="../../js/adminlte.min.js"></script>
+  <!-- date-range-picker -->
+  <script src="../../plugins/daterangepicker/daterangepicker.js"></script>
+  <!-- Toastr -->
+  <script src="../../plugins/toastr/toastr.min.js"></script>
+  <script src="https://momentjs.com/downloads/moment.min.js"></script>
+
+  <script type="text/javascript">
+
+    $(function () {
+
+
+
+      var table = $('#restaurantList').removeAttr('width').DataTable({
+        fixedHeader: true,
+        scrollY: "400px",
+        scrollX: true,
+        scrollCollapse: false,
+        paging: false,
+        searching: true,
+        ordering: false,
+
+        // columnDefs: [
+        //     { width: 200, targets: 0 }
+        // ],
+        fixedColumns: true,
+        dom: 'Bfrtip',
+        buttons: [
+          {
+            extend: 'excelHtml5',
+            text: 'Export to Excel',
+            title: `Bank Account-${moment().format('DD/MM/YYYYh:mm:ssa')}`,
+            message: `Bank Account (Export on ${moment().format('DD/MM/YYYY h:mm:ss a')})`,
+            exportOptions: {
+              columns: [0, 1, 2, 3, 4, 5, 6]
+            },
+            className: 'excel-db'
+
+
+          },
+          // {
+          //   extend: 'csvHtml5',
+          //   title: `Restaurant-${moment().format('DD/MM/YYYYh:mm:ssa')}`,
+          //   customize: function (csv) {
+          //     return `Restaurant List (Export on ${moment().format('DD/MM/YYYY h:mm:ss a')})` + csv;
+          //   },
+          //   exportOptions: {
+          //     columns: [0, 1, 2, 4]
+          //   }
+          // }
+        ]
+      });
+
+      table.buttons(0, null).containers().appendTo($('.ex-btn'));
+
+      $('.myInputTextField').keyup(function () {
+        table.search($(this).val()).draw();
+      })
+
+
+
+    });
+
+
+
+    function updateCommission(vendorId, commissionPercentage) {
+
+      $("#modal-overlay-bank").modal('show');
+      $(".vendorId").val(vendorId);
+      $(".commission").val(commissionPercentage);
+      $(".loader").hide();
+
+    }
+
+    function updateCommissionPercentage() {
+      var formData = $('#updateCommission').serialize()
+
+      var commissionVal = $(".commission").val();
+
+      if (commissionVal == '') {
+        toastr.error('Please enter percentage')
+      } else if (isNaN(commissionVal)) {
+        toastr.error('Please enter valid percentage')
+      } else if (Number(commissionVal) > 100) {
+        toastr.error('Please enter valid percentage')
+      } else {
+
+        $.ajax({
+          url: "/restaurant/updateBankCommission",
+          type: "POST",
+          data: formData,
+          success: function (data, textStatus, jqXHR) {
+            //data - response from server
+            var reqBody = data.body;
+
+            if (reqBody == undefined) {
+              window.location.replace(`/noAccess`);
+            } else {
+              toastr.success(data.msg)
+              $('#modal-overlay-bank').modal('toggle');
+              location.reload();
+            }
+
+
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            toastr.error(data.msg)
+          }
+        });
+
+      }
+
+      console.log(commissionVal);
+    }
+    function changeBankStatus(accountId) {
+      $(".loader").show();
+
+      $.ajax({
+        url: "/restaurant/updateBankStatus",
+        type: "POST",
+        data: { accountId: accountId },
+        success: function (data, textStatus, jqXHR) {
+          //data - response from server
+          var reqBody = data.body;
+          if (reqBody.isActive == true) {
+            $(".bankActive").html('Active');
+            $(".businessName").html(reqBody.businessName);
+            $(".changeBankStatus").html(`<a href='javascript:void(0)' onClick="javascript:changeBankStatus('${accountId}')"> Click to change status</a>`);
+          } else {
+            $(".bankActive").html('Inactive');
+            $(".changeBankStatus").html(`<a href='javascript:void(0)' onClick="javascript:changeBankStatus('${accountId}')"> Click to change status</a>`);
+          }
+          $(".loader").hide();
+          toastr.success(data.msg)
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          toastr.error(data.msg)
+        }
+      });
+
+    }
+
+
+    function deleteBank(vedorId) {
+      if (confirm("Do you want to delete this bank account?")) {
+        // your deletion code
+
+        window.location.replace(`/restaurant/deleteBank?id=${vedorId}`);
+      }
+      return false;
+    }
+
+    function getBankHistory(vendorId) {
+
+      $("#modal-xl").modal('show');
+
+      $.ajax({
+        url: "/restaurant/getBankHistory",
+        type: "POST",
+        data: { vendorId: vendorId },
+        success: function (data, textStatus, jqXHR) {
+
+          $(".log-content").html(data);
+
+          $(".loader").hide();
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          toastr.error(data.msg)
+        }
+      });
+
+    }
+
+    function filterRestaurant() {
+      var chngRes = $('#chngRes').val();
+
+      window.location.replace(`/restaurant/bankAccountList?filter=${chngRes}`);
+
+
+
+      //alert(chngRes);
+    }
+  </script>
+  <% if(messages.msgLog){ %>
+  <script>
+    $(function () {
+      $.notify({
+        // options
+        message: '<%= messages.msgLog %>'
+      }, {
+        // settings
+        type: '<%= messages.msgType %>',
+        spacing: 10,
+        z_index: 1035,
+        animate: {
+          enter: 'animated fadeInDown',
+          exit: 'animated fadeOutUp'
+        }
+      });
+    });
+  </script>
+  <% } %>
+
+</body>
