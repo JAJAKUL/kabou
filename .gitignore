@@ -16,3 +16,26 @@ bin-release/
 # Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
 # should NOT be excluded as they contain compiler settings and other important
 # information for Eclipse / Flash Builder.
+
+# dependencies
+/admin/node_modules
+/service/node_modules
+
+
+.vscode
+
+# Backups and Logs #
+####################
+*.bak*
+*.back*
+*.bk*
+*.~*
+*.log*
+logs/*
+!logs/empty
+
+#FOR NODE API#
+##############
+package-lock.json
+config/.env
+
